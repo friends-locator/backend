@@ -1,1 +1,5 @@
 django==3.1.2
+djoser==2.0.5
+djangorestframework==3.11.2
+markdown==3.3
+django-filter==2.4.0
