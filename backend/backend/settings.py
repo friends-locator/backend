@@ -13,6 +13,7 @@ ALLOWED_HOSTS = [
 
 
 INSTALLED_APPS = [
+    'users.apps.UsersConfig',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -117,4 +118,4 @@ REST_FRAMEWORK = {
 
 INTERNAL_IPS = ("127.0.0.1",)
 
-AUTH_USER_MODEL = "user.CustomUser"
+AUTH_USER_MODEL = "users.CustomUser"
