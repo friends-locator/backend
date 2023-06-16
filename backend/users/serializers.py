@@ -22,9 +22,18 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         )
         write_only_fields = ('password',)
 
-    def validate_username(self, value):
+    def validate_first_name(self, value):
         if not match(r'[\w.@+\-]+', value):
-            raise ValidationError('Некорректный логин')
+            raise ValidationError('Некорректное имя пользователя.')
+        if len(value) > 100:
+            raise ValidationError('Слишком большое имя пользователя.')
+        return value
+
+    def validate_last_name(self, value):
+        if not match(r'[\w.@+\-]+', value):
+            raise ValidationError('Некорректная фамилия пользователя.')
+        if len(value) > 100:
+            raise ValidationError('Слишком большое имя пользователя.')
         return value
 
     def validate_email(self, value):
@@ -32,6 +41,11 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         if User.objects.filter(email=email).exists():
             raise ValidationError('Такой электронный адрес уже существует.')
         return email
+
+    def validate_password(self, value):
+        if len(value) > 20:
+            raise ValidationError('Слишком длинный пароль.')
+        return value
 
 
 # class UserPasswordSerializer(serializers.Serializer):
