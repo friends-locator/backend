@@ -73,6 +73,8 @@ class CustomUserManager(BaseUserManager):
         user.is_staff = True
         # Суперюзер заведомо будет иметь фиксированный статус
         # Создание возможно только после добавления статуса
+        # На момент разработки оставлю заглушку:
+        Status.objects.get_or_create(id=1) # Удалить после разработки
         user.status_id = 1
         user.set_password(password)
         user.save(using=self._db)
@@ -121,6 +123,8 @@ class CustomUser(AbstractUser):
         ],
         verbose_name=_("Фото пользователя"),
         help_text=_("Выберите изображение"),
+        blank=True,
+        null=True,
     )
     tags = models.ManyToManyField(
         Tag,

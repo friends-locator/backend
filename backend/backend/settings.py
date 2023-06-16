@@ -28,6 +28,7 @@ INSTALLED_APPS = [
 
     # Приложения
     "users.apps.UsersConfig",
+    "api.apps.ApiConfig",
 ]
 
 MIDDLEWARE = [
