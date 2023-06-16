@@ -13,6 +13,7 @@ ALLOWED_HOSTS = [
 
 
 INSTALLED_APPS = [
+    'users.apps.UsersConfig',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -22,6 +23,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
+    "colorfield",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -116,3 +119,5 @@ REST_FRAMEWORK = {
 }
 
 INTERNAL_IPS = ("127.0.0.1",)
+
+AUTH_USER_MODEL = "users.CustomUser"
