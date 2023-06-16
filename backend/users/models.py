@@ -1,54 +1,104 @@
 from django.db import models
-
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
 
-from colorfields.fields import ColorField
 
-
-GENDERS = [("male", "Мужской"), ("female", "Женский")]
+from colorfield.fields import ColorField
 
 
 class Status(models.Model):
-    name = models.CharField(max_length=50)
+    """Модель статуса пользователя"""
+
+    name = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name="Текст статуса",
+        help_text="Введите статус",
+    )
 
     def __str__(self):
         return self.name
 
     class Meta:
+        ordering = ["name", ]
         verbose_name = "Статус"
         verbose_name_plural = "Статусы"
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50)
-    color = ColorField(unique=True)
-    slug = models.SlugField(max_length=50, unique=True)
+    """Модель интересов"""
+
+    name = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name="Название",
+        help_text="Введите название",
+    )
+    color = ColorField(unique=True, verbose_name="Цвет")
+    slug = models.SlugField(max_length=50, unique=True, verbose_name="Ссылка")
+
+    class Meta:
+        ordering = ["name", ]
+        verbose_name = "Интерес"
+        verbose_name_plural = "Интересы"
 
     def __str__(self):
         return self.name
 
-    class Meta:
-        verbose_name = "Интерес"
-        verbose_name_plural = "Интересы"
-
 
 class CustomUser(AbstractUser):
+    """Основная модель пользователя"""
+
+    GENDERS = ["Мужской", "Женский",]
+    username_validator = UnicodeUsernameValidator()
+
+    first_name = models.CharField(
+        max_length=150, blank=True,
+        verbose_name="Имя", help_text="Введите имя"
+    )
+    last_name = models.CharField(
+        max_length=150, blank=True,
+        verbose_name="Фамилия", help_text="Введите фамилию"
+    )
+    email = models.EmailField(
+        blank=True, verbose_name="E-mail", help_text="Введите ваш e-mail"
+    )
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        verbose_name="Логин",
+        help_text="Введите логин",
+        validators=[username_validator],
+    )
     userpic = models.ImageField(
-        upload_to="users/",
-        validators=[FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"])],
+        upload_to="uploads/%Y/%m/%d/",
+        validators=[FileExtensionValidator(
+            allowed_extensions=["jpeg", "jpg", "png"])],
+        verbose_name="Фото пользователя",
+        help_text="Выберите изображение",
     )
-    tags = models.ManyToManyField(Tag, related_name="tags")
+    tags = models.ManyToManyField(
+        Tag, related_name="tags",
+        verbose_name="Интересы", help_text="Выберите интересы"
+    )
     status = models.ForeignKey(
-        Status, on_delete=models.CASCADE, related_name="statuses"
+        Status,
+        on_delete=models.CASCADE,
+        related_name="statuses",
+        verbose_name="Статус",
+        help_text="Укажите статус",
     )
-    gender = models.CharField(choices=GENDERS, default="male")
+    gender = models.CharField(
+        max_length=50, choices=[GENDERS, ],
+        verbose_name="Пол", help_text="Укажите ваш пол"
+    )
     start_datetime = models.DateTimeField(auto_now_add=True)
     last_datetime = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
 
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
+
+    def __str__(self):
+        return self.username
