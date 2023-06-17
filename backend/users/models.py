@@ -6,6 +6,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import (FileExtensionValidator, MaxValueValidator,
                                     MinValueValidator)
 from django.db import models
+from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
 
@@ -74,7 +75,7 @@ class CustomUserManager(BaseUserManager):
         # Суперюзер заведомо будет иметь фиксированный статус
         # Создание возможно только после добавления статуса
         # На момент разработки оставлю заглушку:
-        Status.objects.get_or_create(id=1) # Удалить после разработки
+        Status.objects.get_or_create(id=1)  # Удалить после разработки
         user.status_id = 1
         user.set_password(password)
         user.save(using=self._db)
@@ -162,6 +163,12 @@ class CustomUser(AbstractUser):
         blank=True,
         null=True,
     )
+    friends = models.ManyToManyField(
+        "self",
+        through="FriendsRelationship",
+        verbose_name=_("Друзья"),
+        help_text=_("Укажите друзей"),
+    )
 
     class Meta:
         verbose_name = _("Пользователь")
@@ -169,3 +176,32 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class FriendsRelationship(models.Model):
+    """Промежуточная/вспомогательная таблица юзер-друзья."""
+
+    current_user = models.ForeignKey(
+        CustomUser,
+        verbose_name=_("Текущий пользователь"),
+        related_name="current_user",
+        on_delete=models.CASCADE,
+    )
+    friend = models.ForeignKey(
+        CustomUser,
+        verbose_name=_("Друг"),
+        related_name="friend",
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                name=_("%(app_label)s_%(class)s_unique_relationships"),
+                fields=("current_user", "friend"),
+            ),
+            models.CheckConstraint(
+                name=_("%(app_label)s_%(class)s_prevent_self_add"),
+                check=~models.Q(current_user=F("friend")),
+            ),
+        )
