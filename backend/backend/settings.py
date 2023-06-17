@@ -13,18 +13,22 @@ ALLOWED_HOSTS = [
 
 
 INSTALLED_APPS = [
-    'users.apps.UsersConfig',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # Сторонние либы
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
     "colorfield",
-    "users",
+
+    # Приложения
+    "users.apps.UsersConfig",
+    "api.apps.ApiConfig",
 ]
 
 MIDDLEWARE = [
