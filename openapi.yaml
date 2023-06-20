@@ -1,0 +1,545 @@
+openapi: 3.0.3
+info:
+  title: Где друзья - OpenAPI 0.0.1
+  version: 0.0.1
+  description: 
+    Сервис для определения местоположения друзей на карте, добавления друзей по увлечениям, планирования встреч.
+servers:
+  - url: https://localhost:8000/api/v1/
+    description: Dev server
+    
+paths:
+  /users/:
+    get:
+      summary: Список пользователей
+      operationId: Список пользователей
+      description: ''
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: Номер страницы.
+          schema:
+            type: integer
+        - name: limit
+          required: false
+          in: query
+          description: Количество объектов на странице.
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                    description: 'Общее количество объектов в базе'
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://example.org/api/users/?page=4
+                    description: 'Ссылка на следующую страницу'
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://example.org/api/users/?page=2
+                    description: 'Ссылка на предыдущую страницу'
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                    description: 'Список объектов текущей страницы'
+          description: ''
+        'default':
+          description: Все кроме ответа 200
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Пользователи
+    post:
+      summary: Регистрация нового пользователя
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Успешный ответ      
+        '400':
+          description: Неудачное создание
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ValidationError'
+      tags:
+        - Пользователи
+  /users/{id}/:
+    get:
+      summary: Получение данных пользователя по id
+      operationId: Профиль пользователя
+      description: 'Доступно всем пользователям.'
+      security:
+        - Token: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный id этого пользователя"
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        'default':
+          $ref: "#/components/responses/Error"
+      tags:
+        - Пользователи
+    patch:
+      summary: Обновление данных пользователя
+      operationId: Обновление данных пользователеля
+      security:
+        - Token: [ ]
+      description: 'Доступно только владельцу'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный id пользователя"
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: 'Данные пользователя обновлены'
+        '400':
+          $ref: '#/components/responses/NestedValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - Пользователи
+    delete: 
+      summary: Удаление пользователя
+      operationId: Удаление пользователя
+      description: 'Доступно только самому пользователю'
+      security:
+        - Token: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный идентификатор пользователя"
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Пользователь удален'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - Пользователи
+  /users/me/:
+    get:
+      summary: Информация о текущем пользователе
+      operationId: Текущий пользователь
+      description: ''
+      parameters: []
+      security:
+        - Token: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+  /users/set_password/:
+    post:
+      summary: Изменение пароля текущего пользователя
+      operationId: Изменение пароля
+      description: 'Изменение пароля текущего пользователя'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+      responses:
+        '204':
+          description: 'Пароль успешно изменен'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+  /auth/token/login/:
+    post:
+      summary: Получение токена по email и паролю
+      operationId: Получить токен авторизации
+      description: Используется для авторизации по емейлу и паролю, чтобы далее использовать токен при запросах.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenGetResponse'
+          description: ''
+      tags:
+        - Пользователи
+  /auth/token/logout/:
+    post:
+      operationId: Удаление токена
+      description: Удаляет токен текущего пользователя
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+  /tags/:
+    get:
+      summary: Список интересов
+      operationId: Cписок интересов
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+          description: ''
+      tags:
+        - Теги
+  /tags/{id}/:
+    get:
+      operationId: Получение тега
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный идентификатор этого Тега."
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - Теги
+  
+    
+components:
+  schemas:
+    User:
+      type: object
+      required: 
+        - id
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          description: Уникальный id
+          example: 12
+        nickname:
+          type: string
+          description: Имя-ник
+          example: vasya_iv
+        first_name:
+          type: string
+          description: Имя
+          example: Вася
+        last_name:
+          type: string
+          description: Фамилия
+          example: Иванов
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: Электронная почта
+        gender:
+          type: string
+          enum:
+            - мужской
+            - женский
+        start_datetime:
+          type: string
+          format: 2023-06-17T13:00:00+03
+          description: Дата регистрации
+        last_datetime:
+          type: string
+          format: 2023-06-17T13:00:00+03
+          description: Дата последнего посещения
+    UserCreate:
+      type: object
+      required:
+      - nickname
+      - password
+      - email
+      - gender
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        nickname:
+          type: string
+          description: Required. 50 characters or fewer. Letters, digits and ./_
+            only.
+          pattern: ^[\w.]+\z
+          maxLength: 50
+        password:
+          type: string
+          writeOnly: true
+        gender:
+          type: string
+          enum:
+            - мужской
+            - женский
+    UserCreateUpdate: 
+      type: object
+      required:
+      - nickname
+      - password
+      - email
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        nickname:
+          type: string
+          description: Обязательное поле. До 40 символов (буквы, цифры, знаки "." и "_".
+          pattern: ^[\w.]+\z
+          maxLength: 40
+        password:
+          type: string
+          writeOnly: true
+        tags:
+          description: Список интересов
+          type: array
+          example: [1, 2, 7]
+          items:
+            type: integer
+    NotFound:
+      description: Объект не найден
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "Страница не найдена."
+          type: string
+    AuthenticationError:
+      description: Пользователь не авторизован
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "Учетные данные не были предоставлены."
+          type: string
+    ValidationError:
+      description: Стандартные ошибки валидации DRF
+      type: object
+      properties:
+        field_name:
+          description: 'Название поля, в котором произошли ошибки. Таких полей может быть несколько'
+          example: [ 'Обязательное поле.' ]
+          type: array
+          items:
+            type: string
+    NestedValidationError:
+      description: Стандартные ошибки валидации DRF
+      type: object
+      properties:
+        detail:
+          description: 'Ошибки в тегах.'
+          example: Теги не выбраны
+          type: string
+    Error:
+      description: Пользователь не авторизован
+      type: object
+      required: 
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          description: Код ошибки
+        message:
+          type: string
+          description: Сообщение об ошибке
+    PermissionDenied:
+      description: Недостаточно прав
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "У вас недостаточно прав для выполнения данного действия."
+          type: string
+    SetPassword:
+      type: object
+      properties:
+        new_password:
+          type: string
+        current_password:
+          type: string
+      required:
+        - new_password
+        - current_password
+    TokenCreate:
+      type: object
+      properties:
+        password:
+          type: string
+        email:
+          type: string
+    TokenGetResponse:
+      type: object
+      properties:
+        auth_token:
+          type: string
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+          description: 'Название'
+          example: 'Караоке'
+        color:
+          type: string
+          nullable: true
+          maxLength: 7
+          description: 'Цвет в HEX'
+          example: '#E26C2D'
+        slug:
+          type: string
+          nullable: true
+          maxLength: 200
+          pattern: ^[-a-zA-Z0-9_]+$
+          description: 'Уникальный слаг'
+          example: 'karaoke'
+  responses:
+    ValidationError:
+      description: 'Ошибки валидации в стандартном формате DRF'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+    NestedValidationError:
+      description: 'Ошибки валидации в стандартном формате DRF, в том числе с внутренними элементами.'
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/NestedValidationError'
+              - $ref: '#/components/schemas/ValidationError'
+    NotFound:
+      description: Объект не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFound'
+    AuthenticationError:
+      description: Пользователь не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationError'
+    Error:
+      description: Все остальные ошибки
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    PermissionDenied:
+      description: Недостаточно прав
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PermissionDenied'
+      
+  securitySchemes:
+    Token:
+      description: 'Авторизация по токену. <br>
+      Все запросы от имени пользователя должны выполняться с заголовком "Authorization: Token TOKENVALUE"'
+      type: http
+      scheme: token
+     
