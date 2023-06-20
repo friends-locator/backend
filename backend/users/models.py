@@ -96,13 +96,13 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     first_name = models.CharField(
-        max_length=150,
+        max_length=100,
         blank=True,
         verbose_name=_("Имя"),
         help_text=_("Введите имя"),
     )
     last_name = models.CharField(
-        max_length=150,
+        max_length=100,
         blank=True,
         verbose_name=_("Фамилия"),
         help_text=_("Введите фамилию"),
@@ -111,7 +111,7 @@ class CustomUser(AbstractUser):
         verbose_name=_("E-mail"), help_text=_("Введите ваш e-mail")
     )
     username = models.CharField(
-        max_length=150,
+        max_length=100,
         unique=True,
         verbose_name=_("Логин"),
         help_text=_("Введите логин"),
