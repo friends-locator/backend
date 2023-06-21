@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
-from users.models import CustomUser, Tag
+from users.models import CustomUser, Tag, Status
+
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -33,3 +34,4 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 
 admin.site.unregister(Group)
+admin.site.register(Status)

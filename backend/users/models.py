@@ -3,8 +3,11 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.validators import (FileExtensionValidator, MaxValueValidator,
-                                    MinValueValidator)
+from django.core.validators import (
+    FileExtensionValidator,
+    MaxValueValidator,
+    MinValueValidator,
+)
 from django.db import models
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
@@ -39,9 +42,7 @@ class Tag(models.Model):
         help_text=_("Введите название"),
     )
     color = ColorField(unique=True, verbose_name=_("Цвет"))
-    slug = models.SlugField(
-        max_length=50, unique=True, verbose_name=_("Ссылка")
-    )
+    slug = models.SlugField(max_length=50, unique=True, verbose_name=_("Ссылка"))
 
     class Meta:
         ordering = ("name",)
@@ -96,13 +97,13 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     first_name = models.CharField(
-        max_length=150,
+        max_length=100,
         blank=True,
         verbose_name=_("Имя"),
         help_text=_("Введите имя"),
     )
     last_name = models.CharField(
-        max_length=150,
+        max_length=100,
         blank=True,
         verbose_name=_("Фамилия"),
         help_text=_("Введите фамилию"),
@@ -111,7 +112,7 @@ class CustomUser(AbstractUser):
         verbose_name=_("E-mail"), help_text=_("Введите ваш e-mail")
     )
     username = models.CharField(
-        max_length=150,
+        max_length=100,
         unique=True,
         verbose_name=_("Логин"),
         help_text=_("Введите логин"),
@@ -119,9 +120,7 @@ class CustomUser(AbstractUser):
     )
     userpic = models.ImageField(
         upload_to="uploads/%Y/%m/%d/",
-        validators=[
-            FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"])
-        ],
+        validators=[FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"])],
         verbose_name=_("Фото пользователя"),
         help_text=_("Выберите изображение"),
         blank=True,
