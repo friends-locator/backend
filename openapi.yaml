@@ -294,7 +294,97 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - Теги
-  
+  /friends/:
+    get:
+      summary: Список друзей
+      operationId: Список друзей
+      description: 'Страница доступна только текущему пользователю'
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: Номер страницы.
+          schema:
+            type: integer
+        - name: limit
+          required: false
+          in: query
+          description: Количество объектов на странице.
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 19
+                    description: 'Общее количество объектов в базе'
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://example.org/api/users/?page=4
+                    description: 'Ссылка на следующую страницу'
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://example.org/api/users/?page=2
+                    description: 'Ссылка на предыдущую страницу'
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Friend'
+                    description: 'Список объектов текущей страницы'
+          description: ''
+        'default':
+          description: Все кроме ответа 200
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Друзья
+    post:
+      summary: Запрос на добавление друга
+      operationId: addFriend
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FriendAdd'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Friend'
+          description: Друг подтвердил добвление 
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendAdd'
+          description: Направлен запрос на добавление    
+        '400':
+          description: Неудачное создание запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ValidationError'
+        'default':
+          description: Все остальные неудачные ответы
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Друзья
     
 components:
   schemas:
@@ -395,6 +485,41 @@ components:
           example: [1, 2, 7]
           items:
             type: integer
+    Friend:
+      type: object
+      required: 
+        - id
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          description: Уникальный id
+          example: 12
+        nickname:
+          type: string
+          description: Имя-ник
+          example: vasya_iv
+        first_name:
+          type: string
+          description: Имя
+          example: Вася
+        last_name:
+          type: string
+          description: Фамилия
+          example: Иванов
+    FriendAdd:
+      type: object
+      required:
+      - id
+      - email
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
     NotFound:
       description: Объект не найден
       type: object
