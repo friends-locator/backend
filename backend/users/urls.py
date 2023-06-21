@@ -5,6 +5,6 @@ app_name = "users"
 
 urlpatterns = [
     path("...", admin.site.urls),
-    path('v1/', include('djoser.urls')),
-    path('v1/', include('djoser.urls.jwt')),
+    path("v1/", include("djoser.urls")),
+    path("v1/", include("djoser.urls.jwt")),
 ]
