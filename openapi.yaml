@@ -29,6 +29,7 @@ paths:
             type: integer
       responses:
         '200':
+          description: 'Удачный ответ'
           content:
             application/json:
               schema:
@@ -55,7 +56,6 @@ paths:
                     items:
                       $ref: '#/components/schemas/User'
                     description: 'Список объектов текущей страницы'
-          description: ''
         'default':
           description: Все кроме ответа 200
           content:
@@ -215,7 +215,7 @@ paths:
           $ref: '#/components/responses/AuthenticationError'
       tags:
         - Пользователи
-  /auth/token/login/:
+  /token/login/:
     post:
       summary: Получение токена по email и паролю
       operationId: Получить токен авторизации
@@ -235,7 +235,7 @@ paths:
           description: ''
       tags:
         - Пользователи
-  /auth/token/logout/:
+  /token/logout/:
     post:
       operationId: Удаление токена
       description: Удаляет токен текущего пользователя
@@ -296,6 +296,8 @@ paths:
         - Теги
   /friends/:
     get:
+      security:
+        - Token: []
       summary: Список друзей
       operationId: Список друзей
       description: 'Страница доступна только текущему пользователю'
@@ -350,27 +352,23 @@ paths:
       tags:
         - Друзья
     post:
-      summary: Запрос на добавление друга
-      operationId: addFriend
+      security:
+        - Token: []
+      summary: Поиск друга по email
+      operationId: FriendSearch
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FriendAdd'
+              $ref: '#/components/schemas/Email'
       responses:
         '200':
+          description: Друг найден 
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Friend'
-          description: Друг подтвердил добвление 
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FriendAdd'
-          description: Направлен запрос на добавление    
         '400':
           description: Неудачное создание запроса
           content:
@@ -385,7 +383,107 @@ paths:
                 $ref: "#/components/schemas/Error"
       tags:
         - Друзья
-    
+  /friends/add/:
+    get:
+      security:
+        - Token: []
+      summary: Полученнные запросы на добавление в друзья
+      operationId: friendsAdd
+      description: Запросы на добавление в друзья
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: Номер страницы.
+          schema:
+            type: integer
+        - name: limit
+          required: false
+          in: query
+          description: Количество объектов на странице.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Удачный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 19
+                    description: 'Общее количество объектов в базе'
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://example.org/api/users/?page=4
+                    description: 'Ссылка на следующую страницу'
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://example.org/api/users/?page=2
+                    description: 'Ссылка на предыдущую страницу'
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FriendAdd'
+                    description: 'Список объектов текущей страницы'
+        'default':
+          description: Все остальные неудачные ответы
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Друзья  
+    post:
+      security:
+        - Token: []
+      summary: Запрос на добавление по email
+      operationId: addOnEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Email'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendAdd'
+          description: Пользователь зарегистрирован, ему направлен запрос на добавление.
+        '202':
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  detail: 
+                    type: string
+                    description: Пользователь не зарегистрирован, ему отправлено приглашение на почту.
+                    example: Пользователь не зарегистрирован, ему отправлено приглашение на почту.
+          description: Пользователь не зарегистрирован, ему отправлено приглашение на почту.
+        '400':
+          description: Неудачное создание запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ValidationError'
+        'default':
+          description: Все остальные неудачные ответы
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Друзья
+
 components:
   schemas:
     User:
@@ -507,7 +605,43 @@ components:
           type: string
           description: Фамилия
           example: Иванов
+        lat:
+          type: string
+          description: Широта
+          example: 55.7522200
+        lon:
+          type: string
+          description: Широта
+          example: 37.6155600
     FriendAdd:
+      type: object
+      required:
+      - id
+      - email
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          description: Уникальный id
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: "Адрес электронной почты"
+          example: "vpupkin@yandex.ru"
+        first_name:
+          type: string
+          description: Имя
+          example: Вася
+        last_name:
+          type: string
+          description: Фамилия
+          example: Иванов
+        nickname:
+          type: string
+          description: Имя-ник
+          example: vasya_iv
+    Email:
       type: object
       required:
       - id
@@ -660,11 +794,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/PermissionDenied'
-      
   securitySchemes:
     Token:
       description: 'Авторизация по токену. <br>
-      Все запросы от имени пользователя должны выполняться с заголовком "Authorization: Token TOKENVALUE"'
+      Все запросы от имени пользователя должны выполняться с заголовком "Bearer: Token TOKENVALUE"'
       type: http
       scheme: token
-     
