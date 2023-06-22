@@ -23,12 +23,12 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         write_only_fields = ("password",)
 
     def validate_first_name(self, value):
-        if not match(r"[А-Яа-яA-Za-z]+", value):
+        if not match(r"[А-Яа-яA-Za-z ]+", value):
             raise ValidationError("Некорректное имя пользователя.")
         return value
 
     def validate_last_name(self, value):
-        if not match(r"[А-Яа-яA-Za-z]+", value):
+        if not match(r"[А-Яа-яA-Za-z ]+", value):
             raise ValidationError("Некорректная фамилия пользователя.")
         return value
 

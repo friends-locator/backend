@@ -3,11 +3,8 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.validators import (
-    FileExtensionValidator,
-    MaxValueValidator,
-    MinValueValidator,
-)
+from django.core.validators import (FileExtensionValidator, MaxValueValidator,
+                                    MinValueValidator)
 from django.db import models
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
@@ -42,7 +39,9 @@ class Tag(models.Model):
         help_text=_("Введите название"),
     )
     color = ColorField(unique=True, verbose_name=_("Цвет"))
-    slug = models.SlugField(max_length=50, unique=True, verbose_name=_("Ссылка"))
+    slug = models.SlugField(
+        max_length=50, unique=True, verbose_name=_("Ссылка")
+    )
 
     class Meta:
         ordering = ("name",)
@@ -120,7 +119,9 @@ class CustomUser(AbstractUser):
     )
     userpic = models.ImageField(
         upload_to="uploads/%Y/%m/%d/",
-        validators=[FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"])],
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"])
+        ],
         verbose_name=_("Фото пользователя"),
         help_text=_("Выберите изображение"),
         blank=True,
