@@ -140,6 +140,10 @@ DJOSER = {
         "user": "users.serializers.CustomUserSerializer",
         "current_user": "users.serializers.CustomUserSerializer",
     },
+    "PASSWORD_RESET_CONFIRM_URL": "set_password/{uid}/{token}",
+    "SEND_CONFIRMATION_EMAIL": True,
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
 }
 
 SIMPLE_JWT = {
@@ -150,3 +154,11 @@ SIMPLE_JWT = {
 INTERNAL_IPS = ("127.0.0.1",)
 
 AUTH_USER_MODEL = "users.CustomUser"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "mail.friends.locator"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_PORT = "465"
+EMAIL_USE_TLS = True
+SERVER_EMAIL = EMAIL_HOST_USER
