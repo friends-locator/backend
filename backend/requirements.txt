@@ -6,4 +6,6 @@ markdown==3.3
 django-filter==22.1
 Pillow==9.5.0
 python-dotenv==0.21.1
-django-colorfield
+django-colorfield==0.9.0
+psycopg2-binary==2.9.6
+gunicorn==20.0.4
