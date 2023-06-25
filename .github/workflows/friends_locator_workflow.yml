@@ -2,9 +2,10 @@ name: Friends locator workflow
 
 on:
   push:
+    branches-ignore:
+      - "main"
+      - "develop"
     branches:
-      - "!main"
-      - "!develop"
       - "**"
   pull_request:
     branches:
