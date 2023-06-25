@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "djoser",
     "colorfield",
+    "django_filters",
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
