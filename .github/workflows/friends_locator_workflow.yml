@@ -36,7 +36,7 @@ jobs:
 
   tests1:
     runs-on: ubuntu-latest
-    if: ${{ github.base_ref == 'develop' && github.event.pull_request.merged == 'true' }}
+    if: ${{ github.base_ref == 'develop' }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
