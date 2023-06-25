@@ -3,7 +3,13 @@ name: Friends locator workflow
 on:
   push:
     branches:
-      - 'feature/**'
+      - "!main"
+      - "!develop"
+      - "**"
+  pull_request:
+    branches:
+      - "main"
+      - "develop"
 
 jobs:
   tests:
