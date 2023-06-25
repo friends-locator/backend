@@ -2,7 +2,6 @@
 
 Description: backend's API.
 
-
 Used technologies:
 -
     - python 3.11
