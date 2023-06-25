@@ -15,7 +15,7 @@ jobs:
 
   tests1:
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.merged }}
+    if: ${{ github.event.pull_request.merged == true }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
