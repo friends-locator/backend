@@ -34,7 +34,7 @@ jobs:
             python -m flake8
   tests1:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' && github.event.pull_request.merged == 'true'
+    if: ${{ github.ref == 'refs/heads/main' && github.event.pull_request.merged == 'true' }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
