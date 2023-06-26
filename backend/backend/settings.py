@@ -121,12 +121,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": [
-        "rest_framework.pagination.PageNumberPagination"
-    ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated"
-    ],
+    "DEFAULT_PAGINATION_CLASS": ["rest_framework.pagination.PageNumberPagination"],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
@@ -140,10 +136,11 @@ DJOSER = {
         "user": "users.serializers.CustomUserSerializer",
         "current_user": "users.serializers.CustomUserSerializer",
     },
-    "PASSWORD_RESET_CONFIRM_URL": "set_password/{uid}/{token}",
-    "SEND_CONFIRMATION_EMAIL": True,
-    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
+    "ACTIVATION_URL": "#/activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
     "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    "PASSWORD_RESET_CONFIRM_URL": "#/activate/{uid}/{token}",
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
 }
 
 SIMPLE_JWT = {
@@ -155,10 +152,15 @@ INTERNAL_IPS = ("127.0.0.1",)
 
 AUTH_USER_MODEL = "users.CustomUser"
 
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "mail.friends.locator"
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-EMAIL_PORT = "465"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = "587"
 EMAIL_USE_TLS = True
-SERVER_EMAIL = EMAIL_HOST_USER
+
+EMAIL_HOST_USER = "friendslocinfo@gmail.com"
+EMAIL_HOST_PASSWORD = "aiaiqhjexjkhrttn"
+
+EMAIL_SERVER = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = ["friendslocinfo@gmail.com"]

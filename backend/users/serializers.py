@@ -43,6 +43,4 @@ class CustomUserSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = (
-            "__all__"  # пока так, нужно обсудить какие поля будем возвращать
-        )
+        fields = "__all__"  # пока так, нужно обсудить какие поля будем возвращать
