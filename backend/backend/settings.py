@@ -75,26 +75,26 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#         "ATOMIC_REQUESTS": True,
-#     }
-# }
-
-# Postgress
 DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DB_ENGINE', default="django.db.backends.postgresql"),
-        'NAME': os.getenv('DB_NAME', default="postgres"),
-        'USER': os.getenv('POSTGRES_USER', default="postgres"),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default="adm"),
-        'HOST': os.getenv('DB_HOST', default="db"),
-        'PORT': os.getenv('DB_PORT', default="5432"),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
         "ATOMIC_REQUESTS": True,
     }
 }
+
+# Postgress
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.getenv('DB_ENGINE', default="django.db.backends.postgresql"),
+#         'NAME': os.getenv('DB_NAME', default="postgres"),
+#         'USER': os.getenv('POSTGRES_USER', default="postgres"),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default="adm"),
+#         'HOST': os.getenv('DB_HOST', default="db"),
+#         'PORT': os.getenv('DB_PORT', default="5432"),
+#         "ATOMIC_REQUESTS": True,
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -147,6 +147,11 @@ DJOSER = {
         "user": "users.serializers.CustomUserSerializer",
         "current_user": "users.serializers.CustomUserSerializer",
     },
+    "ACTIVATION_URL": "#/activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    "PASSWORD_RESET_CONFIRM_URL": "#/activate/{uid}/{token}",
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
 }
 
 SIMPLE_JWT = {
@@ -157,3 +162,16 @@ SIMPLE_JWT = {
 INTERNAL_IPS = ("127.0.0.1",)
 
 AUTH_USER_MODEL = "users.CustomUser"
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = "587"
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = "friendslocinfo@gmail.com"
+EMAIL_HOST_PASSWORD = "aiaiqhjexjkhrttn"
+
+EMAIL_SERVER = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = ["friendslocinfo@gmail.com"]
