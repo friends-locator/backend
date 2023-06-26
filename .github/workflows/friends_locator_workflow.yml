@@ -73,7 +73,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/friends-locator-backend:latest
-
+            cd ../home/
             sudo docker compose stop
             sudo docker compose rm -f backend
             touch .env
