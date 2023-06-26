@@ -21,7 +21,7 @@ services:
        retries: 5
 
   backend:
-    build: 7ide/infra-backend:latest
+    build: 7ide/friends-locator-backend:latest
     restart: always
     volumes:
       - static_volume:/app/backend_static/
