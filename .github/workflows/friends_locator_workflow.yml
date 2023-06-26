@@ -61,7 +61,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-
+    needs: build_and_push_to_docker_hub
     if: github.event.pull_request.merged == true && github.base_ref == 'main'
     steps:
       - name: Executing remote ssh commands to deploy
@@ -73,7 +73,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/friends-locator-backend:latest
-
+            cd ../home/
             sudo docker compose stop
             sudo docker compose rm -f backend
             touch .env
