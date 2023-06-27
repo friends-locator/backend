@@ -40,7 +40,14 @@ Replace file called ".env.sample" with file called ".env" file and fill it with 
     #### docker-compose up -d --build
 For now app is available at localhost
 
-sdfsdf
+### Some additional commands:
+1. Create admin-user:
+    #### winpty docker-compose exec backend python manage.py createsuperuser
+2. To make dump of DB:
+    #### docker-compose exec backend python manage.py dumpdata > your_fixture_name.json
+3. To load fixtures:
+    #### docker-compose exec backend python manage.py loaddata your_fixture_name.json
+
 If you'll need any *manage.py* commands then you'll want to use prefix:
 
     docker-compose exec backend python manage.py *comand*
