@@ -1,6 +1,6 @@
-from pathlib import Path
 import os
 from datetime import timedelta
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -32,13 +32,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Сторонние либы
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
     "colorfield",
-
+    "django_filters",
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
@@ -85,13 +84,15 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 # Postgress
 DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DB_ENGINE', default="django.db.backends.postgresql"),
-        'NAME': os.getenv('DB_NAME', default="postgres"),
-        'USER': os.getenv('POSTGRES_USER', default="postgres"),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default="adm"),
-        'HOST': os.getenv('DB_HOST', default="db"),
-        'PORT': os.getenv('DB_PORT', default="5432"),
+    "default": {
+        "ENGINE": os.getenv(
+            "DB_ENGINE", default="django.db.backends.postgresql"
+        ),
+        "NAME": os.getenv("DB_NAME", default="postgres"),
+        "USER": os.getenv("POSTGRES_USER", default="postgres"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
+        "HOST": os.getenv("DB_HOST", default="db"),
+        "PORT": os.getenv("DB_PORT", default="5432"),
         "ATOMIC_REQUESTS": True,
     }
 }
