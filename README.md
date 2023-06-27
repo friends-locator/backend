@@ -34,9 +34,9 @@ Replace file called ".env.sample" with file called ".env" file and fill it with 
 - DB_PORT=5432
 
 ## Docker:
-
-Build and launch containers:
-
+1. This app's using external volume for DB so before you start you should create this volume:
+    #### docker volume create --name=pg_volume
+2. After that build and launch containers:
     #### docker-compose up -d --build
 For now app is available at localhost
 
