@@ -75,26 +75,26 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-        "ATOMIC_REQUESTS": True,
-    }
-}
-
-# Postgress
 # DATABASES = {
-#     'default': {
-#         'ENGINE': os.getenv('DB_ENGINE', default="django.db.backends.postgresql"),
-#         'NAME': os.getenv('DB_NAME', default="postgres"),
-#         'USER': os.getenv('POSTGRES_USER', default="postgres"),
-#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default="adm"),
-#         'HOST': os.getenv('DB_HOST', default="db"),
-#         'PORT': os.getenv('DB_PORT', default="5432"),
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
 #         "ATOMIC_REQUESTS": True,
 #     }
 # }
+
+# Postgress
+DATABASES = {
+    'default': {
+        'ENGINE': os.getenv('DB_ENGINE', default="django.db.backends.postgresql"),
+        'NAME': os.getenv('DB_NAME', default="postgres"),
+        'USER': os.getenv('POSTGRES_USER', default="postgres"),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default="adm"),
+        'HOST': os.getenv('DB_HOST', default="db"),
+        'PORT': os.getenv('DB_PORT', default="5432"),
+        "ATOMIC_REQUESTS": True,
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -121,7 +121,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = "static/"
+STATIC_URL = "backend_static/"
 STATIC_ROOT = BASE_DIR / "backend_static"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
