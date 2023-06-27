@@ -48,7 +48,7 @@ class CustomUserSerializer(UserSerializer):
             'email',
             'username',
             'first_name',
-            'last_name',  # пока так, нужно обсудить какие поля будем возвращать
+            'last_name',
         )
 
 
@@ -62,7 +62,7 @@ class FriendSerializer(ModelSerializer):
             'email',
             'username',
             'first_name',
-            'last_name',  # пока так, нужно обсудить какие поля будем возвращать
+            'last_name',
         )
 
         read_only_fields = (
