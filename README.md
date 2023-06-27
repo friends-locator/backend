@@ -40,6 +40,7 @@ Replace file called ".env.sample" with file called ".env" file and fill it with 
     #### docker-compose up -d --build
 For now app is available at localhost
 
+111
 ### Some additional commands:
 1. Create admin-user:
     #### winpty docker-compose exec backend python manage.py createsuperuser
