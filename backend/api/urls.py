@@ -12,8 +12,7 @@ path("v1/", include("djoser.urls.jwt")),
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "BACKEND": "django.template.backends.django.DjangoTemplates",       "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
