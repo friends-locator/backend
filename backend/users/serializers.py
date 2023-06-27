@@ -1,8 +1,8 @@
 from re import match
 
 from django.contrib.auth import get_user_model
-from djoser.serializers import UserSerializer, UserCreateSerializer
-from rest_framework.serializers import ValidationError
+from djoser.serializers import UserCreateSerializer, UserSerializer
+from rest_framework.serializers import ModelSerializer, ValidationError
 
 User = get_user_model()
 
@@ -44,5 +44,30 @@ class CustomUserSerializer(UserSerializer):
     class Meta:
         model = User
         fields = (
-            "__all__"  # пока так, нужно обсудить какие поля будем возвращать
+            'id',
+            'email',
+            'username',
+            'first_name',
+            'last_name',  # пока так, нужно обсудить какие поля будем возвращать
+        )
+
+
+class FriendSerializer(ModelSerializer):
+    """Кастомный сериализатор для работы с друзьями."""
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'email',
+            'username',
+            'first_name',
+            'last_name',  # пока так, нужно обсудить какие поля будем возвращать
+        )
+
+        read_only_fields = (
+            'email',
+            'username',
+            'first_name',
+            'last_name',
         )
