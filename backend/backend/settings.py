@@ -74,28 +74,28 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#         "ATOMIC_REQUESTS": True,
-#     }
-# }
-
-# Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv(
-            "DB_ENGINE", default="django.db.backends.postgresql"
-        ),
-        "NAME": os.getenv("DB_NAME", default="postgres"),
-        "USER": os.getenv("POSTGRES_USER", default="postgres"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
-        "HOST": os.getenv("DB_HOST", default="db"),
-        "PORT": os.getenv("DB_PORT", default="5432"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
         "ATOMIC_REQUESTS": True,
     }
 }
+
+# Postgress
+# DATABASES = {
+#     "default": {
+#         "ENGINE": os.getenv(
+#             "DB_ENGINE", default="django.db.backends.postgresql"
+#         ),
+#         "NAME": os.getenv("DB_NAME", default="postgres"),
+#         "USER": os.getenv("POSTGRES_USER", default="postgres"),
+#         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
+#         "HOST": os.getenv("DB_HOST", default="db"),
+#         "PORT": os.getenv("DB_PORT", default="5432"),
+#         "ATOMIC_REQUESTS": True,
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -148,11 +148,11 @@ DJOSER = {
         "user": "users.serializers.CustomUserSerializer",
         "current_user": "users.serializers.CustomUserSerializer",
     },
-    "ACTIVATION_URL": "#/activate/{uid}/{token}",
-    "SEND_ACTIVATION_EMAIL": True,
-    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
-    "PASSWORD_RESET_CONFIRM_URL": "#/activate/{uid}/{token}",
-    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
+    # "ACTIVATION_URL": "#/activate/{uid}/{token}",
+    # "SEND_ACTIVATION_EMAIL": True,
+    # "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    # "PASSWORD_RESET_CONFIRM_URL": "#/activate/{uid}/{token}",
+    # "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
 }
 
 SIMPLE_JWT = {
