@@ -161,7 +161,7 @@ SIMPLE_JWT = {
 }
 
 INTERNAL_IPS = ("127.0.0.1",)
-CSRF_TRUSTED_ORIGINS = ("http://flap.acceleratorpracticum.ru",)
+CSRF_TRUSTED_ORIGINS = ("http://flap.acceleratorpracticum.ru", "https://flap.acceleratorpracticum.ru",)
 AUTH_USER_MODEL = "users.CustomUser"
 
 
