@@ -161,7 +161,7 @@ SIMPLE_JWT = {
 }
 
 INTERNAL_IPS = ("127.0.0.1",)
-CSRF_TRUSTED_ORIGINS = ("http://flap.acceleratorpracticum.ru",)
+CSRF_TRUSTED_ORIGINS = ("http://flap.acceleratorpracticum.ru", "https://flap.acceleratorpracticum.ru",)
 AUTH_USER_MODEL = "users.CustomUser"
 
 
@@ -170,9 +170,9 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = "587"
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = "friendslocinfo@gmail.com"
-EMAIL_HOST_PASSWORD = "aiaiqhjexjkhrttn"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-EMAIL_ADMIN = ["friendslocinfo@gmail.com"]
+EMAIL_ADMIN = EMAIL_HOST_USER
