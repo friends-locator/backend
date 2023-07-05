@@ -10,14 +10,14 @@ app_name = "api"
 
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="\"Where are my friends?\" API",
-      default_version='v1',
-      description="Документация приложения backend проекта \"Где друзья?\"",
-      license=openapi.License(name="BSD License"),
-   ),
-   public=True,
-   permission_classes=[permissions.AllowAny],
+    openapi.Info(
+        title="\"Where are my friends?\" API",
+        default_version='v1',
+        description="Документация приложения backend проекта \"Где друзья?\"",
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=[permissions.AllowAny],
 )
 
 
@@ -34,9 +34,11 @@ urlpatterns = [
 
 
 # Отдельный набор путей для документации
-urlpatterns += [
+urlpatterns += {
     path('v1/swagger/', schema_view.with_ui('swagger', cache_timeout=0),
-        name='schema-swagger-ui'),
+         name='schema-swagger-ui'
+         ),
     path('v1/redoc/', schema_view.with_ui('redoc', cache_timeout=0),
-        name='schema-redoc'),
-]
+         name='schema-redoc'
+         ),
+}
