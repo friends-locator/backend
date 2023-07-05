@@ -209,3 +209,32 @@ class FriendsRelationship(models.Model):
                 check=~models.Q(current_user=F("friend")),
             ),
         )
+
+
+class FriendsRequest(models.Model):
+    """Таблица запросов в друзья."""
+
+    from_user = models.ForeignKey(
+        CustomUser,
+        verbose_name=_("Текущий пользователь"),
+        related_name="user",
+        on_delete=models.CASCADE,
+    )
+    to_user = models.ForeignKey(
+        CustomUser,
+        verbose_name=_("Друг"),
+        related_name="new_friend",
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                name=_("%(app_label)s_%(class)s_unique_relationships"),
+                fields=("from_user", "to_user"),
+            ),
+            models.CheckConstraint(
+                name=_("%(app_label)s_%(class)s_prevent_self_add"),
+                check=~models.Q(from_user=F("to_user")),
+            ),
+        )
