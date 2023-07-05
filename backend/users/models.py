@@ -214,13 +214,13 @@ class FriendsRelationship(models.Model):
 class FriendsRequest(models.Model):
     """Таблица запросов в друзья."""
 
-    current_user = models.ForeignKey(
+    from_user = models.ForeignKey(
         CustomUser,
         verbose_name=_("Текущий пользователь"),
         related_name="user",
         on_delete=models.CASCADE,
     )
-    friend = models.ForeignKey(
+    to_user = models.ForeignKey(
         CustomUser,
         verbose_name=_("Друг"),
         related_name="new_friend",
@@ -231,10 +231,10 @@ class FriendsRequest(models.Model):
         constraints = (
             models.UniqueConstraint(
                 name=_("%(app_label)s_%(class)s_unique_relationships"),
-                fields=("current_user", "friend"),
+                fields=("from_user", "to_user"),
             ),
             models.CheckConstraint(
                 name=_("%(app_label)s_%(class)s_prevent_self_add"),
-                check=~models.Q(current_user=F("friend")),
+                check=~models.Q(from_user=F("to_user")),
             ),
         )

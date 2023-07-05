@@ -148,11 +148,11 @@ DJOSER = {
         "user": "users.serializers.CustomUserSerializer",
         "current_user": "users.serializers.CustomUserSerializer",
     },
-    # "ACTIVATION_URL": "#/activate/{uid}/{token}",
-    # "SEND_ACTIVATION_EMAIL": True,
-    # "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
-    # "PASSWORD_RESET_CONFIRM_URL": "#/activate/{uid}/{token}",
-    # "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
+    "ACTIVATION_URL": "#/activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    "PASSWORD_RESET_CONFIRM_URL": "#/activate/{uid}/{token}",
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
 }
 
 SIMPLE_JWT = {

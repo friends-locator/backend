@@ -29,7 +29,10 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "password",
+                    models.CharField(max_length=128, verbose_name="password"),
+                ),
                 (
                     "last_login",
                     models.DateTimeField(
@@ -63,7 +66,8 @@ class Migration(migrations.Migration):
                 (
                     "date_joined",
                     models.DateTimeField(
-                        default=django.utils.timezone.now, verbose_name="date joined"
+                        default=django.utils.timezone.now,
+                        verbose_name="date joined",
                     ),
                 ),
                 (
@@ -361,7 +365,9 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="friendsrequest",
             constraint=models.CheckConstraint(
-                check=models.Q(("current_user", models.F("friend")), _negated=True),
+                check=models.Q(
+                    ("current_user", models.F("friend")), _negated=True
+                ),
                 name="users_friendsrequest_prevent_self_add",
             ),
         ),
@@ -375,7 +381,9 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="friendsrelationship",
             constraint=models.CheckConstraint(
-                check=models.Q(("current_user", models.F("friend")), _negated=True),
+                check=models.Q(
+                    ("current_user", models.F("friend")), _negated=True
+                ),
                 name="users_friendsrelationship_prevent_self_add",
             ),
         ),
