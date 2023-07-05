@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "djoser",
     "colorfield",
     "django_filters",
+    "drf_yasg",
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
@@ -75,11 +76,11 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#         "ATOMIC_REQUESTS": True,
-#     }
+#    "default": {
+#        "ENGINE": "django.db.backends.sqlite3",
+#        "NAME": BASE_DIR / "db.sqlite3",
+#        "ATOMIC_REQUESTS": True,
+#    }
 # }
 
 # Postgress
@@ -129,9 +130,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": [
+    "DEFAULT_PAGINATION_CLASS": (
         "rest_framework.pagination.PageNumberPagination"
-    ],
+    ),
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated"
     ],
