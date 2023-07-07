@@ -31,9 +31,7 @@ class CustomUserViewSet(UserViewSet):
     @action(detail=False)
     def friends(self, request):
         friends = request.user.friends.all()
-        serializer = FriendSerializer(
-            friends, many=True, context={"request": request}
-        )
+        serializer = FriendSerializer(friends, many=True, context={"request": request})
         return Response(serializer.data, status=HTTP_200_OK)
 
     @action(
@@ -50,12 +48,8 @@ class CustomUserViewSet(UserViewSet):
         )
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-        if FriendsRequest.objects.filter(
-            from_user=to_user, to_user=from_user
-        ).exists():
-            FriendsRequest.objects.filter(
-                from_user=to_user, to_user=from_user
-            ).delete()
+        if FriendsRequest.objects.filter(from_user=to_user, to_user=from_user).exists():
+            FriendsRequest.objects.filter(from_user=to_user, to_user=from_user).delete()
             from_user.friends.add(to_user)
         else:
             FriendsRequest.objects.create(from_user=from_user, to_user=to_user)
@@ -81,9 +75,7 @@ class CustomUserViewSet(UserViewSet):
             return Response(
                 {"errors": "Такой заявки нет."}, status=HTTP_400_BAD_REQUEST
             )
-        FriendsRequest.objects.filter(
-            from_user=from_user, to_user=to_user
-        ).delete()
+        FriendsRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
         from_user.friends.add(to_user)
         return Response(serializer.data, status=HTTP_201_CREATED)
 
@@ -122,9 +114,7 @@ class CustomUserViewSet(UserViewSet):
                 {"errors": "Такой заявки не существует."},
                 status=HTTP_400_BAD_REQUEST,
             )
-        FriendsRequest.objects.filter(
-            from_user=from_user, to_user=to_user
-        ).delete()
+        FriendsRequest.objects.filter(from_user=from_user, to_user=to_user).delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
     @action(
@@ -137,5 +127,47 @@ class CustomUserViewSet(UserViewSet):
         all_requests = User.objects.filter(user__to_user=request.user)
         serializer = FriendSerializer(
             all_requests, many=True, context={"request": request}
+        )
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    @action(
+        methods=["put"],
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+        url_path="update-position",
+    )
+    def update_position(self, request, **kwargs):
+        user = request.user
+        serializer = CustomUserSerializer(
+            user,
+            data=request.data,
+            longitude=self.kwargs.get("longitude"),
+            latitude=self.kwargs.get("latitude"),
+            context={"request": request},
+        )
+        serializer.save()
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    @action(
+        methods=["get"],
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+        url_path="get-friends",
+    )
+    def get_friends(self, request, **kwargs):
+        user = request.user
+        start_longitude = (self.kwargs.get("start_longitude"),)
+        start_latitude = (self.kwargs.get("start_latitude"),)
+        end_longitude = (self.kwargs.get("end_longitude"),)
+        end_latitude = (self.kwargs.get("end_latitude"),)
+        longitude = (self.kwargs.get("longitude"),)
+        latitude = (self.kwargs.get("latitude"),)
+        nearby_friends = FriendsRequest.objects.filter(
+            longitude in [start_longitude, end_longitude],
+            latitude in [start_latitude, end_latitude],
+            user=user,
+        )
+        serializer = FriendSerializer(
+            user, nearby_friends, data=request.data, context={"request": request}
         )
         return Response(serializer.data, status=HTTP_200_OK)

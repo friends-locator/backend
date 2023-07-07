@@ -42,9 +42,7 @@ class Tag(models.Model):
         help_text=_("Введите название"),
     )
     color = ColorField(unique=True, verbose_name=_("Цвет"))
-    slug = models.SlugField(
-        max_length=50, unique=True, verbose_name=_("Ссылка")
-    )
+    slug = models.SlugField(max_length=50, unique=True, verbose_name=_("Ссылка"))
 
     class Meta:
         ordering = ("name",)
@@ -122,9 +120,7 @@ class CustomUser(AbstractUser):
     )
     userpic = models.ImageField(
         upload_to="uploads/%Y/%m/%d/",
-        validators=[
-            FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"])
-        ],
+        validators=[FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"])],
         verbose_name=_("Фото пользователя"),
         help_text=_("Выберите изображение"),
         blank=True,
@@ -161,8 +157,8 @@ class CustomUser(AbstractUser):
         null=True,
     )
     longitude = models.FloatField(
-        verbose_name=_("Широта"),
-        help_text=_("Укажите широту"),
+        verbose_name=_("Долгота"),
+        help_text=_("Укажите долготу"),
         validators=(MinValueValidator(-180.1), MaxValueValidator(90.1)),
         blank=True,
         null=True,
