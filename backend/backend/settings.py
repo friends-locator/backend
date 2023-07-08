@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
+    "elasticemailbackend"
 ]
 
 MIDDLEWARE = [
@@ -165,12 +166,13 @@ CSRF_TRUSTED_ORIGINS = ("http://flap.acceleratorpracticum.ru", "https://flap.acc
 AUTH_USER_MODEL = "users.CustomUser"
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = "587"
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")  
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 EMAIL_SERVER = EMAIL_HOST_USER
