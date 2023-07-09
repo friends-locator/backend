@@ -75,28 +75,28 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#         "ATOMIC_REQUESTS": True,
-#     }
-# }
-
-# Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv(
-            "DB_ENGINE", default="django.db.backends.postgresql"
-        ),
-        "NAME": os.getenv("DB_NAME", default="postgres"),
-        "USER": os.getenv("POSTGRES_USER", default="postgres"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
-        "HOST": os.getenv("DB_HOST", default="db"),
-        "PORT": os.getenv("DB_PORT", default="5432"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
         "ATOMIC_REQUESTS": True,
     }
 }
+
+# Postgress
+# DATABASES = {
+#     "default": {
+#         "ENGINE": os.getenv(
+#             "DB_ENGINE", default="django.db.backends.postgresql"
+#         ),
+#         "NAME": os.getenv("DB_NAME", default="postgres"),
+#         "USER": os.getenv("POSTGRES_USER", default="postgres"),
+#         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
+#         "HOST": os.getenv("DB_HOST", default="db"),
+#         "PORT": os.getenv("DB_PORT", default="5432"),
+#         "ATOMIC_REQUESTS": True,
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -141,6 +141,8 @@ REST_FRAMEWORK = {
     ],
 }
 
+DOMAIN = "flap.acceleratorpracticum.ru"
+
 DJOSER = {
     "HIDE_USERS": False,
     "LOGIN_FIELD": "email",
@@ -168,8 +170,8 @@ AUTH_USER_MODEL = "users.CustomUser"
 
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 
-ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY", default="68D12885A2C5B6E3D6AB72F554607F639F1942B9CDC9811C3417BEADD1D30105D2A6ADD4BA7B17E09156B07D070EF128")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", default="friends-locator@yandex.ru")
 
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
