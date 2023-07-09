@@ -130,9 +130,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": [
-        "rest_framework.pagination.PageNumberPagination"
-    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated"
     ],
@@ -141,7 +139,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-DOMAIN = "flap.acceleratorpracticum.ru"
+DOMAIN = "127.0.0.1:8000"
 SITE_NAME = "flap.acceleratorpracticum.ru"
 
 DJOSER = {
@@ -152,11 +150,14 @@ DJOSER = {
         "user": "users.serializers.CustomUserSerializer",
         "current_user": "users.serializers.CustomUserSerializer",
     },
-    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "ACTIVATION_URL": "api/account-activate/{uid}/{token}/",
     "SEND_ACTIVATION_EMAIL": True,
-    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
-    "PASSWORD_RESET_CONFIRM_URL": "activate/{uid}/{token}",
-    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
+    # Это нужно будет согласовывать с фронтом: они должны будут принять эту
+    # ссылку и вывести экран для ввода нового пароля, который вместе с uid и
+    # token улетит на password_reset_confirm
+    # "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    # "PASSWORD_RESET_CONFIRM_URL": "api/password-change/{uid}/{token}",
+    # "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
 }
 
 SIMPLE_JWT = {
