@@ -141,6 +141,9 @@ REST_FRAMEWORK = {
     ],
 }
 
+DOMAIN = "flap.acceleratorpracticum.ru"
+SITE_NAME = "flap.acceleratorpracticum.ru"
+
 DJOSER = {
     "HIDE_USERS": False,
     "LOGIN_FIELD": "email",
@@ -169,7 +172,7 @@ AUTH_USER_MODEL = "users.CustomUser"
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 
 ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", default="friends-locator@yandex.ru")
 
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
