@@ -32,12 +32,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     # Сторонние либы
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
     "colorfield",
     "django_filters",
+
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
@@ -139,7 +141,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-DOMAIN = "127.0.0.1:8000"
+DOMAIN = "flap.acceleratorpracticum.ru"
 SITE_NAME = "flap.acceleratorpracticum.ru"
 
 DJOSER = {
