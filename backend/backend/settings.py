@@ -75,28 +75,28 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#         "ATOMIC_REQUESTS": True,
-#     }
-# }
-
-# Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv(
-            "DB_ENGINE", default="django.db.backends.postgresql"
-        ),
-        "NAME": os.getenv("DB_NAME", default="postgres"),
-        "USER": os.getenv("POSTGRES_USER", default="postgres"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
-        "HOST": os.getenv("DB_HOST", default="db"),
-        "PORT": os.getenv("DB_PORT", default="5432"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
         "ATOMIC_REQUESTS": True,
     }
 }
+
+# Postgress
+# DATABASES = {
+#     "default": {
+#         "ENGINE": os.getenv(
+#             "DB_ENGINE", default="django.db.backends.postgresql"
+#         ),
+#         "NAME": os.getenv("DB_NAME", default="postgres"),
+#         "USER": os.getenv("POSTGRES_USER", default="postgres"),
+#         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
+#         "HOST": os.getenv("DB_HOST", default="db"),
+#         "PORT": os.getenv("DB_PORT", default="5432"),
+#         "ATOMIC_REQUESTS": True,
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -172,7 +172,7 @@ AUTH_USER_MODEL = "users.CustomUser"
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 
 ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", default="friends-locator@yandex.ru")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
