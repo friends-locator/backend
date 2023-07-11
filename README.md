@@ -23,7 +23,6 @@ Features:
 
 # Launch instructions:
 
-
 ## enviroment:
 Replace file called ".env.sample" with file called ".env" file and fill it with required keys:
 - SECRET_KEY=...
