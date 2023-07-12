@@ -9,11 +9,11 @@ from users.views import CustomUserViewSet, ActivateUserView
 app_name = "api"
 
 openapi_info = openapi.Info(
-    title="\"Where are my friends?\" API",
-    default_version='v1',
+    title='"Where are my friends?" API',
+    default_version="v1",
     description=(
         "Specification for the backend "
-        "project application \"Where are my friends?\""
+        'project application "Where are my friends?"'
     ),
     license=openapi.License(name="BSD License"),
 )
@@ -31,19 +31,24 @@ urlpatterns = [
     path("v1/", include(router.urls)),
     path("v1/", include("djoser.urls")),
     path("v1/", include("djoser.urls.jwt")),
-    path('account-activate/<uid>/<token>/', ActivateUserView.as_view()),
+    path("account-activate/<uid>/<token>/", ActivateUserView.as_view()),
 ]
 
-# Отдельный набор путей для документации
+
 urlpatterns += [
-    re_path(r"^v1/swagger(?P<format>\.json|\.yaml)$",
-            schema_view.without_ui(cache_timeout=0),
-            name="schema-json"
-            ),
-    path("v1/swagger/", schema_view.with_ui("swagger", cache_timeout=0),
-         name='schema-swagger-ui'
-         ),
-    path("v1/redoc/", schema_view.with_ui("redoc", cache_timeout=0),
-         name='schema-redoc'
-         ),
+    re_path(
+        r"^v1/swagger(?P<format>\.json|\.yaml)$",
+        schema_view.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    path(
+        "v1/swagger/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path(
+        "v1/redoc/",
+        schema_view.with_ui("redoc", cache_timeout=0),
+        name="schema-redoc",
+    ),
 ]

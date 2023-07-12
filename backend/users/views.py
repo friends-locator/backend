@@ -142,6 +142,51 @@ class CustomUserViewSet(UserViewSet):
         )
         return Response(serializer.data, status=HTTP_200_OK)
 
+    @action(
+        methods=["put"],
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+        url_path="update-position",
+    )
+    def update_position(self, request, **kwargs):
+        user = request.user
+        serializer = CustomUserSerializer(
+            user,
+            data=request.data,
+            longitude=self.kwargs.get("longitude"),
+            latitude=self.kwargs.get("latitude"),
+            context={"request": request},
+        )
+        serializer.save()
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    @action(
+        methods=["get"],
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+        url_path="get-friends",
+    )
+    def get_friends(self, request, **kwargs):
+        user = request.user
+        start_longitude = (self.kwargs.get("start_longitude"),)
+        start_latitude = (self.kwargs.get("start_latitude"),)
+        end_longitude = (self.kwargs.get("end_longitude"),)
+        end_latitude = (self.kwargs.get("end_latitude"),)
+        longitude = (self.kwargs.get("longitude"),)
+        latitude = (self.kwargs.get("latitude"),)
+        nearby_friends = FriendsRequest.objects.filter(
+            longitude in [start_longitude, end_longitude],
+            latitude in [start_latitude, end_latitude],
+            user=user,
+        )
+        serializer = FriendSerializer(
+            user,
+            nearby_friends,
+            data=request.data,
+            context={"request": request},
+        )
+        return Response(serializer.data, status=HTTP_200_OK)
+
 
 class ActivateUserView(GenericAPIView):
     """Подтверждение мейла."""
@@ -150,26 +195,9 @@ class ActivateUserView(GenericAPIView):
 
     def get(self, request, uid, token, format=None):
         """Отправка POST вместо GET."""
-        print(request)
-        payload = {'uid': uid, 'token': token}
+        payload = {"uid": uid, "token": token}
         actiavtion_url = "http://localhost:8000/api/v1/users/activation/"
         response = requests.post(actiavtion_url, data=payload)
-        if response.status_code == 204:
-            return Response({}, response.status_code)
-        return Response(response.json())
-
-
-class ResetPasswordView(GenericAPIView):
-    """Подтверждение мейла."""
-
-    permission_classes = [AllowAny]
-
-    def get(self, request, uid, token, format=None):
-        """Отправка POST вместо GET."""
-        print(request)
-        payload = {'uid': uid, 'token': token}
-        url = "http://localhost:8000/api/v1/users/reset_password_confirm/"
-        response = requests.post(url, data=payload)
         if response.status_code == 204:
             return Response({}, response.status_code)
         return Response(response.json())
