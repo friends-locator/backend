@@ -4,7 +4,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from api.views import TagViewSet
-from users.views import CustomUserViewSet
+from users.views import CustomUserViewSet, ActivateUserView
 
 app_name = "api"
 
@@ -31,6 +31,7 @@ urlpatterns = [
     path("v1/", include(router.urls)),
     path("v1/", include("djoser.urls")),
     path("v1/", include("djoser.urls.jwt")),
+    path('account-activate/<uid>/<token>/', ActivateUserView.as_view()),
 ]
 
 # Отдельный набор путей для документации
