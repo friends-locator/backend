@@ -154,13 +154,13 @@ class CustomUserViewSet(UserViewSet):
             data=self.request.data,
             context={"request": request},
         )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data=serializer.data, status=HTTP_201_CREATED)
-        else:
+        if not serializer.is_valid():
             return Response(
                 data=serializer.errors, status=HTTP_400_BAD_REQUEST
             )
+        else:
+            serializer.save()
+            return Response(data=serializer.data, status=HTTP_201_CREATED)
 
     @action(
         methods=["get"],
