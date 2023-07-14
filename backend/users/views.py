@@ -158,9 +158,8 @@ class CustomUserViewSet(UserViewSet):
             return Response(
                 data=serializer.errors, status=HTTP_400_BAD_REQUEST
             )
-        else:
-            serializer.save()
-            return Response(data=serializer.data, status=HTTP_201_CREATED)
+        serializer.save()
+        return Response(data=serializer.data, status=HTTP_201_CREATED)
 
     @action(
         methods=["get"],
