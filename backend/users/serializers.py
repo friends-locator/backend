@@ -2,7 +2,10 @@ from re import match
 
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework.serializers import (
+    ModelSerializer,
+    ValidationError,
+)
 
 User = get_user_model()
 
@@ -49,7 +52,16 @@ class CustomUserSerializer(UserSerializer):
             "username",
             "first_name",
             "last_name",
+            "longitude",
+            "latitude",
         )
+
+    def validate(self, data):
+        if "longitude" not in data or "latitude" not in data:
+            raise ValidationError(
+                "Требуется передавать оба параметра широты и долготы."
+            )
+        return data
 
 
 class FriendSerializer(ModelSerializer):
@@ -63,11 +75,14 @@ class FriendSerializer(ModelSerializer):
             "username",
             "first_name",
             "last_name",
+            "longitude",
+            "latitude",
         )
-
         read_only_fields = (
             "email",
             "username",
             "first_name",
             "last_name",
+            "longitude",
+            "latitude",
         )
