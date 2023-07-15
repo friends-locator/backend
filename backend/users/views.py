@@ -1,11 +1,13 @@
+import requests
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
@@ -188,3 +190,18 @@ class CustomUserViewSet(UserViewSet):
         if len(serializer.data) == 0:
             return Response(serializer.data, status=HTTP_204_NO_CONTENT)
         return Response(serializer.data, status=HTTP_200_OK)
+
+
+class ActivateUserView(GenericAPIView):
+    """Подтверждение мейла."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, uid, token, format=None):
+        """Отправка POST вместо GET."""
+        payload = {"uid": uid, "token": token}
+        actiavtion_url = "http://localhost:8000/api/v1/users/activation/"
+        response = requests.post(actiavtion_url, data=payload)
+        if response.status_code == 204:
+            return Response({}, response.status_code)
+        return Response(response.json())

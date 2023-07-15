@@ -111,7 +111,9 @@ class CustomUser(AbstractUser):
         help_text=_("Введите фамилию"),
     )
     email = models.EmailField(
-        verbose_name=_("E-mail"), help_text=_("Введите ваш e-mail")
+        verbose_name=_("E-mail"),
+        help_text=_("Введите ваш e-mail"),
+        unique=True,
     )
     username = models.CharField(
         max_length=100,
