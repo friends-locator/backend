@@ -13,7 +13,11 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 from users.models import FriendsRelationship, FriendsRequest
-from users.serializers import CustomUserSerializer, FriendSerializer
+from users.serializers import (
+    CoordinateSerializer,
+    CustomUserSerializer,
+    FriendSerializer,
+)
 
 User = get_user_model()
 
@@ -148,7 +152,7 @@ class CustomUserViewSet(UserViewSet):
     )
     def update_coordinates(self, request, **kwargs):
         user = get_object_or_404(User, id=self.kwargs.get("id"))
-        serializer = CustomUserSerializer(
+        serializer = CoordinateSerializer(
             user,
             partial=True,
             data=self.request.data,
@@ -169,8 +173,7 @@ class CustomUserViewSet(UserViewSet):
     )
     def get_friends(self, request, **kwargs):
         friends = request.user.friends.all()
-        nearby_friends = User.objects.filter(
-            friend__friend__in=friends,
+        nearby_friends = friends.filter(
             longitude__gte=self.request.data["start_longitude"],
             longitude__lte=self.request.data["end_longitude"],
             latitude__gte=self.request.data["start_latitude"],

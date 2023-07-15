@@ -56,13 +56,6 @@ class CustomUserSerializer(UserSerializer):
             "latitude",
         )
 
-    def validate(self, data):
-        if "longitude" not in data or "latitude" not in data:
-            raise ValidationError(
-                "Требуется передавать оба параметра широты и долготы."
-            )
-        return data
-
 
 class FriendSerializer(ModelSerializer):
     """Кастомный сериализатор для работы с друзьями."""
@@ -86,3 +79,21 @@ class FriendSerializer(ModelSerializer):
             "longitude",
             "latitude",
         )
+
+
+class CoordinateSerializer(ModelSerializer):
+    """Кастомный сериализатор для работы с координатами."""
+
+    class Meta:
+        model = User
+        fields = (
+            "longitude",
+            "latitude",
+        )
+
+    def validate(self, data):
+        if "longitude" not in data or "latitude" not in data:
+            raise ValidationError(
+                "Требуется передавать оба параметра широты и долготы."
+            )
+        return data
