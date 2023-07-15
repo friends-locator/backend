@@ -365,9 +365,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="friendsrequest",
             constraint=models.CheckConstraint(
-                check=models.Q(
-                    ("current_user", models.F("friend")), _negated=True
-                ),
+                check=models.Q(("current_user", models.F("friend")), _negated=True),
                 name="users_friendsrequest_prevent_self_add",
             ),
         ),
@@ -381,9 +379,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="friendsrelationship",
             constraint=models.CheckConstraint(
-                check=models.Q(
-                    ("current_user", models.F("friend")), _negated=True
-                ),
+                check=models.Q(("current_user", models.F("friend")), _negated=True),
                 name="users_friendsrelationship_prevent_self_add",
             ),
         ),

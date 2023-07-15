@@ -163,8 +163,8 @@ class CustomUser(AbstractUser):
         null=True,
     )
     longitude = models.FloatField(
-        verbose_name=_("Широта"),
-        help_text=_("Укажите широту"),
+        verbose_name=_("Долгота"),
+        help_text=_("Укажите долготу"),
         validators=(MinValueValidator(-180.1), MaxValueValidator(90.1)),
         blank=True,
         null=True,
