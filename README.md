@@ -42,7 +42,7 @@ Replace file called ".env.sample" with file called ".env" file and fill it with 
     #### docker-compose up -d --build
 For now app is available at localhost
 
-sdfsdf
+
 If you'll need any *manage.py* commands then you'll want to use prefix:
 
     docker-compose exec backend python manage.py *comand*
