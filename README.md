@@ -34,6 +34,7 @@ Replace file called ".env.sample" with file called ".env" file and fill it with 
 - DB_HOST=db
 - DB_PORT=5432
 
+
 ## Docker:
 1. This app's using external volume for DB so before you start you should create this volume:
     #### docker volume create --name=pg_volume
