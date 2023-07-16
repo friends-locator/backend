@@ -15,7 +15,11 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 from users.models import FriendsRelationship, FriendsRequest
-from users.serializers import CustomUserSerializer, FriendSerializer
+from users.serializers import (
+    CoordinateSerializer,
+    CustomUserSerializer,
+    FriendSerializer,
+)
 
 User = get_user_model()
 
@@ -143,22 +147,25 @@ class CustomUserViewSet(UserViewSet):
         return Response(serializer.data, status=HTTP_200_OK)
 
     @action(
-        methods=["put"],
-        detail=False,
+        methods=["patch"],
+        detail=True,
         permission_classes=(IsAuthenticated,),
-        url_path="update-position",
+        url_path="update-coordinates",
     )
-    def update_position(self, request, **kwargs):
-        user = request.user
-        serializer = CustomUserSerializer(
+    def update_coordinates(self, request, **kwargs):
+        user = get_object_or_404(User, id=self.kwargs.get("id"))
+        serializer = CoordinateSerializer(
             user,
-            data=request.data,
-            longitude=self.kwargs.get("longitude"),
-            latitude=self.kwargs.get("latitude"),
+            partial=True,
+            data=self.request.data,
             context={"request": request},
         )
+        if not serializer.is_valid():
+            return Response(
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
+            )
         serializer.save()
-        return Response(serializer.data, status=HTTP_200_OK)
+        return Response(data=serializer.data, status=HTTP_201_CREATED)
 
     @action(
         methods=["get"],
@@ -167,24 +174,21 @@ class CustomUserViewSet(UserViewSet):
         url_path="get-friends",
     )
     def get_friends(self, request, **kwargs):
-        user = request.user
-        start_longitude = (self.kwargs.get("start_longitude"),)
-        start_latitude = (self.kwargs.get("start_latitude"),)
-        end_longitude = (self.kwargs.get("end_longitude"),)
-        end_latitude = (self.kwargs.get("end_latitude"),)
-        longitude = (self.kwargs.get("longitude"),)
-        latitude = (self.kwargs.get("latitude"),)
-        nearby_friends = FriendsRequest.objects.filter(
-            longitude in [start_longitude, end_longitude],
-            latitude in [start_latitude, end_latitude],
-            user=user,
+        friends = request.user.friends.all()
+        nearby_friends = friends.filter(
+            longitude__gte=self.request.data["start_longitude"],
+            longitude__lte=self.request.data["end_longitude"],
+            latitude__gte=self.request.data["start_latitude"],
+            latitude__lte=self.request.data["end_latitude"],
         )
         serializer = FriendSerializer(
-            user,
-            nearby_friends,
-            data=request.data,
+            data=nearby_friends,
+            many=True,
             context={"request": request},
         )
+        serializer.is_valid()
+        if len(serializer.data) == 0:
+            return Response(serializer.data, status=HTTP_204_NO_CONTENT)
         return Response(serializer.data, status=HTTP_200_OK)
 
 
