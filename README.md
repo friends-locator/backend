@@ -23,6 +23,7 @@ Features:
 
 # Launch instructions:
 
+
 ## enviroment:
 Replace file called ".env.sample" with file called ".env" file and fill it with required keys:
 - SECRET_KEY=...
@@ -33,6 +34,7 @@ Replace file called ".env.sample" with file called ".env" file and fill it with 
 - DB_HOST=db
 - DB_PORT=5432
 
+
 ## Docker:
 1. This app's using external volume for DB so before you start you should create this volume:
     #### docker volume create --name=pg_volume
@@ -40,7 +42,7 @@ Replace file called ".env.sample" with file called ".env" file and fill it with 
     #### docker-compose up -d --build
 For now app is available at localhost
 
-sdfsdf
+
 If you'll need any *manage.py* commands then you'll want to use prefix:
 
     docker-compose exec backend python manage.py *comand*

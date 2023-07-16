@@ -89,9 +89,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv(
-            "DB_ENGINE", default="django.db.backends.postgresql"
-        ),
+        "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
         "NAME": os.getenv("DB_NAME", default="postgres"),
         "USER": os.getenv("POSTGRES_USER", default="postgres"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
@@ -171,7 +169,10 @@ SIMPLE_JWT = {
 }
 
 INTERNAL_IPS = ("127.0.0.1",)
-CSRF_TRUSTED_ORIGINS = ("http://flap.acceleratorpracticum.ru", "https://flap.acceleratorpracticum.ru",)
+CSRF_TRUSTED_ORIGINS = (
+    "http://flap.acceleratorpracticum.ru",
+    "https://flap.acceleratorpracticum.ru",
+)
 AUTH_USER_MODEL = "users.CustomUser"
 
 
