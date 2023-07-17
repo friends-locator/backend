@@ -1,5 +1,5 @@
 import os
-from corsheaders.defaults import default_headers
+
 from datetime import timedelta
 from pathlib import Path
 
