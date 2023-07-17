@@ -1,4 +1,5 @@
 import os
+from corsheaders.defaults import default_headers
 from datetime import timedelta
 from pathlib import Path
 
@@ -44,10 +45,12 @@ INSTALLED_APPS = [
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
-    "elasticemailbackend"
+    "elasticemailbackend",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -56,6 +59,19 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8000',
+    "http://127.0.0.1:8000",
+    "null",
+)
+
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'Access-Control-Allow-Origin',
+)
 
 ROOT_URLCONF = "backend.urls"
 
