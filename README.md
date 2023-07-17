@@ -18,7 +18,7 @@ Used technologies:
     - djangorestframework 3.14
     - python-dotenv 0.21.1
     - django-filter 22.1
-    - PostgreSQL
+    - PostgreSQL 13.0
     - Docker
 
 
@@ -26,141 +26,80 @@ Features:
 -
     - You can search and add new friends
     - You can view your friends location
+    - You can invite new friends
+    - You can accept friend requests
+    - You can remove users from friends
     - Admin-zone
-    - ...
 
 
-### How to start a project:
+# Launch instructions:
 
-1. Clone a repository and change to it on the command line:
-
-```
-git clone git@github.com:friends-locator/backend.git
-```
-
-```
-cd backend
-```
-
-2. Create and activate virtual environment:
-
-```
-python3 -m venv venv
-or
-python -m venv venv
-```
-
-```
-. venv/bin/activate
-or
-source venv/Scripts/activate
-```
-
-3. Install requirements from a file requirements.txt:
-
-```
-pip install -r requirements.txt
-```
-
-4. Run migrations:
-
-```
-python3 manage.py migrate
-or
-python manage.py migrate
-```
-
-5. Start project:
-
-```
-python3 manage.py runserver
-or
-python manage.py runserver
-```
-
-
-### How to run documentation:
-
-1. Open application Docker
-
-2. Go to directory infra:
-
-```
-cd infra
-```
-
-3. Run docker-compose:
-
-```
-docker-compose up
-```
-
-Documentation and request examples are available at:
-
-```
-http://flap.acceleratorpracticum.ru/api/docs/
-```
-
-
-### How to run a project on a remote server:
-
-1. Clone a repository and change to it on the command line:
-
-```
-git clone git@github.com:friends-locator/backend.git
-```
-
-```
-cd backend
-```
-
-2. Copy the docker-compose.yml and nginx.conf files from the infra folder to the remote server:
+Copy the docker-compose.yml and nginx.conf files from the infra folder to the remote server:
 
 ```
 cd backend/infra/
 ```
 
 ```
-scp docker-compose.yml <username>@<IP>:/home/<username>/
-scp nginx.conf <username>@<IP>:/home/<username>/
+scp docker-compose.yml <username>@<IP>:/<address of your project on the server>/
+scp nginx.conf <username>@<IP>:/<address of your project on the server>/
 # username - username of the server
 # IP - public IP address of the server
 ```
 
-3. In the repository settings on GitHub, create environment variables in the Settings -> Secrets -> Actions:
+## enviroment:
+Replace file called ".env.example" with file called ".env" file and fill it with required keys:
+- SECRET_KEY=... # secret key from Django project
+- DB_ENGINE=... # indicate that we are working with postgresql
+- DB_NAME=... # database name
+- POSTGRES_USER=... # login to connect to the database
+- POSTGRES_PASSWORD=... # password to connect to the database (set your own)
+- DB_HOST=db # name of the service (container)
+- DB_PORT=5432 # port to connect to the database
 
-```
-SSH_KEY # private ssh key
-PASSPHRASE # ssh key password
-DOCKER_USERNAME # login DockerHub
-DOCKER_PASSWORD # password DockerHub
-SECRET_KEY # secret key from Django project
-HOST # public IP address of the server
-USER # username of the server
+## Docker:
+1. This app's using external volume for DB so before you start you should create this volume:
+    #### docker volume create --name=pg_volume
+2. After that build and launch containers:
+    #### docker-compose up -d --build
+For now app is available at localhost
 
-DB_ENGINE=django.db.backends.postgresql # indicate that we are working with postgresql
-DB_NAME=postgres # database name
-POSTGRES_USER=postgres # login to connect to the database
-POSTGRES_PASSWORD=postgres # password to connect to the database (set your own)
-DB_HOST=db # name of the service (container)
-DB_PORT=5432 # port to connect to the database
-```
 
-4. Run docker-compose on the server:
+If you'll need any *manage.py* commands then you'll want to use prefix:
 
-```
-sudo docker-compose up -d
-```
+    docker-compose exec backend python manage.py *comand*
 
-5. Now in the container you need to create and run migrations, collect statics and create a superuser. Execute commands in sequence:
+Admin-zone is available at:
 
-```
-docker-compose exec web python manage.py makemigrations
-docker-compose exec web python manage.py migrate
-docker-compose exec web python manage.py collectstatic --no-input
-docker-compose exec web python manage.py createsuperuser
-```
+    https://your_host/admin/
 
+All available endpoints and responses you can find in documentation:
+
+    https://your_host/api/docs/
+
+
+Examples requests:
+-
+    - GET http://127.0.0.1:8000/api/v1/users/me
+    - POST http://127.0.0.1:8000/api/v1/users/id/add-friend
+    - DELETE http://127.0.0.1:8000/api/v1/users/id/delete-friend
+
+Examples of responses:
+-
+    - GET {
+        "id": 5,
+        "email": "kolya@mail.ru",
+        "username": "kolya",
+        "first_name": "",
+        "last_name": ""
+        }
+    - POST {
+        "id": 3,
+        "email": "pasha@mail.ru",
+        "username": "pasha",
+        "first_name": "",
+        "last_name": ""
+        }
 
 ### Project authors:
 
