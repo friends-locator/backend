@@ -1,5 +1,5 @@
 import os
-
+from corsheaders.defaults import default_headers
 from datetime import timedelta
 from pathlib import Path
 
@@ -60,7 +60,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
@@ -73,7 +72,6 @@ CORS_ORIGIN_WHITELIST = (
 CORS_ALLOW_HEADERS = default_headers + (
     'Access-Control-Allow-Origin',
 )
-
 
 ROOT_URLCONF = "backend.urls"
 
