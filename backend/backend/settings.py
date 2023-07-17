@@ -4,6 +4,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
+from corsheaders.defaults import default_headers
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -65,14 +66,14 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8000',
-    # "http://127.0.0.1:8000",
-    # "null",
+    "http://127.0.0.1:8000",
+    "null",
 )
 
 
-# CORS_ALLOW_HEADERS = default_headers + (
-#     'Access-Control-Allow-Origin',
-# )
+CORS_ALLOW_HEADERS = default_headers + (
+    'Access-Control-Allow-Origin',
+)
 
 
 ROOT_URLCONF = "backend.urls"
