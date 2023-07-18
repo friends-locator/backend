@@ -175,6 +175,8 @@ class CustomUser(AbstractUser):
         verbose_name=_("Друзья"),
         help_text=_("Укажите друзей"),
     )
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ("username",)
 
     class Meta:
         verbose_name = _("Пользователь")
