@@ -1,10 +1,11 @@
 from django.urls import include, path, re_path
-from rest_framework.routers import DefaultRouter
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+from rest_framework.routers import DefaultRouter
+
 from api.views import TagViewSet
-from users.views import CustomUserViewSet, ActivateUserView
+from users.views import ActivateUserView, CustomUserViewSet
 
 app_name = "api"
 
