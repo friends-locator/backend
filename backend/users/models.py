@@ -3,11 +3,8 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.validators import (
-    FileExtensionValidator,
-    MaxValueValidator,
-    MinValueValidator,
-)
+from django.core.validators import (FileExtensionValidator, MaxValueValidator,
+                                    MinValueValidator)
 from django.db import models
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
@@ -42,9 +39,7 @@ class Tag(models.Model):
         help_text=_("Введите название"),
     )
     color = ColorField(unique=True, verbose_name=_("Цвет"))
-    slug = models.SlugField(
-        max_length=50, unique=True, verbose_name=_("Ссылка")
-    )
+    slug = models.SlugField(unique=True, verbose_name=_("Ссылка"))
 
     class Meta:
         ordering = ("name",)
@@ -140,11 +135,12 @@ class CustomUser(AbstractUser):
     )
     status = models.ForeignKey(
         Status,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="statuses",
         verbose_name=_("Статус"),
         help_text=_("Укажите статус"),
         default=1,
+        null=True
     )
     gender = models.CharField(
         max_length=50,

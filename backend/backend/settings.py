@@ -1,10 +1,9 @@
 import os
-
 from datetime import timedelta
 from pathlib import Path
 
-from dotenv import load_dotenv
 from corsheaders.defaults import default_headers
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -18,12 +17,12 @@ SECRET_KEY = os.getenv(
 DEBUG = True
 
 ALLOWED_HOSTS = (
-    "localhost",
-    "backend",
-    "127.0.0.1",
-    "flap.acceleratorpracticum.ru",
-    "80.87.106.172",
-    "0.0.0.0",
+    os.getenv("LOCALHOST"),
+    os.getenv("LOCALHOSTIP"),
+    os.getenv("CONTAINER_NAME"),
+    os.getenv("DOMAIN"),
+    os.getenv("SERVER_IP"),
+    os.getenv("EVERYONE"),
 )
 
 
@@ -61,19 +60,18 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Убрать в проде
 CORS_ORIGIN_ALLOW_ALL = True
-
-
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8000',
     "http://127.0.0.1:8000",
     "null",
 )
 
-
 CORS_ALLOW_HEADERS = default_headers + (
     'Access-Control-Allow-Origin',
 )
+
 
 ROOT_URLCONF = "backend.urls"
 
@@ -130,8 +128,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
+    {
+        "NAME": "users.validators.MaximumLengthValidator",
+    },
 ]
 
+NAME_REGEX_PATTERN = r"[А-Яа-яA-Za-z ]+"
 
 LANGUAGE_CODE = "ru"
 
@@ -160,8 +162,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-DOMAIN = "flap.acceleratorpracticum.ru"
-SITE_NAME = "flap.acceleratorpracticum.ru"
+DOMAIN = os.getenv("DOMAIN")
+SITE_NAME = DOMAIN
 
 DJOSER = {
     "HIDE_USERS": False,
@@ -186,13 +188,15 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-INTERNAL_IPS = ("127.0.0.1",)
+INTERNAL_IPS = (
+    os.getenv("LOCALHOSTIP"),
+)
+
 CSRF_TRUSTED_ORIGINS = (
-    "http://flap.acceleratorpracticum.ru",
-    "https://flap.acceleratorpracticum.ru",
+    "http://" + DOMAIN,
+    "https://" + DOMAIN,
 )
 AUTH_USER_MODEL = "users.CustomUser"
-
 
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 
