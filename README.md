@@ -48,7 +48,7 @@ scp nginx.conf <username>@<IP>:/<address of your project on the server>/
 ```
 
 ## enviroment:
-Replace file called ".env.example" with file called ".env" file and fill it with required keys:
+In the repository settings on GitHub, create environment variables in the Settings -> Secrets -> Actions:
 - SECRET_KEY=... # secret key from Django project
 - DB_ENGINE=... # indicate that we are working with postgresql
 - DB_NAME=... # database name
