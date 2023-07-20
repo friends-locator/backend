@@ -96,6 +96,7 @@ jobs:
             echo EVERYONE=${{ secrets.EVERYONE }} >> .env
             echo ACTIVATION_URL=${{ secrets.ACTIVATION_URL }} >> .env
             echo LOGIN_URL_=${{ secrets.LOGIN_URL_ }} >> .env
+            sudo docker compose up -d
 
   send_message:
     runs-on: ubuntu-latest
