@@ -164,6 +164,9 @@ REST_FRAMEWORK = {
 
 DOMAIN = os.getenv("DOMAIN")
 SITE_NAME = DOMAIN
+ACTIVATION_URL = os.getenv("ACTIVATION_URL")
+LOGIN_URL_ = os.getenv("LOGIN_URL_")
+
 
 DJOSER = {
     "HIDE_USERS": False,
