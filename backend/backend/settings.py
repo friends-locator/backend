@@ -18,7 +18,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = (
     os.getenv("LOCALHOST"),
-    os.getenv("LOCALHOSTIP"),
+    os.getenv("LOCALHOST_IP"),
     os.getenv("CONTAINER_NAME"),
     os.getenv("DOMAIN"),
     os.getenv("SERVER_IP"),
