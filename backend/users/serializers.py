@@ -2,9 +2,11 @@ from re import match
 
 from django.conf import settings
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework.serializers import (ModelSerializer, ValidationError,
+                                        SerializerMethodField)
 
 from .models import CustomUser as User
+from .models import FriendsRelationship, FriendsCategory
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -49,8 +51,30 @@ class CustomUserSerializer(UserSerializer):
         )
 
 
+class FriendCategorySerializer(ModelSerializer):
+    """Кастомный сериализатор для работы с категориями друзей."""
+    class Meta:
+        model = FriendsCategory
+        fields = (
+            "id",
+            "name",
+        )
+
+
+class FriendsRelationshipSerializer(ModelSerializer):
+    """Кастомный сериализатор для работы с дружескими связями."""
+    class Meta:
+        model = FriendsRelationship
+        fields = (
+            "current_user",
+            "friend",
+            "friend_category",
+        )
+
+
 class FriendSerializer(ModelSerializer):
     """Кастомный сериализатор для работы с друзьями."""
+    friend_category = SerializerMethodField()
 
     class Meta:
         model = User
@@ -62,6 +86,7 @@ class FriendSerializer(ModelSerializer):
             "last_name",
             "longitude",
             "latitude",
+            "friend_category",
         )
         read_only_fields = (
             "email",
@@ -70,7 +95,16 @@ class FriendSerializer(ModelSerializer):
             "last_name",
             "longitude",
             "latitude",
+            "friend_category",
         )
+
+    def get_friend_category(self, obj):
+        friend_id = getattr(obj, "id")
+        friend_data = FriendsRelationship.objects.get(friend_id=friend_id)
+        category = FriendsCategory.objects.get(
+            pk=friend_data.friend_category_id
+        )
+        return category.name
 
 
 class CoordinateSerializer(ModelSerializer):
