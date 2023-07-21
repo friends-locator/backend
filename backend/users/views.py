@@ -24,7 +24,7 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
     pagination_class = None
     filter_backends = (DjangoFilterBackend, SearchFilter)
-    filterset_fields = ("tags", "friends_category_id",)
+    filterset_fields = ("tags",)
     search_fields = ("^email",)
 
     @action(detail=False)
