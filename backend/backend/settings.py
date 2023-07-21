@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     # Сторонние либы
     "rest_framework",
     "rest_framework.authtoken",
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     "colorfield",
     "django_filters",
     "drf_yasg",
+
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
@@ -186,7 +188,9 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-INTERNAL_IPS = (os.getenv("LOCALHOSTIP"),)
+INTERNAL_IPS = (
+    os.getenv("LOCALHOSTIP"),
+)
 
 CSRF_TRUSTED_ORIGINS = (
     "http://" + DOMAIN,

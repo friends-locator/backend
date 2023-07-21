@@ -76,6 +76,7 @@ class UserpicSerializer(ModelSerializer):
             "user",
             "userpic",
         )
+    read_only_fields = ("user",)
 
 
 class FriendSerializer(ModelSerializer):
