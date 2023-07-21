@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Сторонние либы
     "rest_framework",
     "rest_framework.authtoken",
@@ -41,7 +40,6 @@ INSTALLED_APPS = [
     "colorfield",
     "django_filters",
     "drf_yasg",
-
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
@@ -63,14 +61,12 @@ MIDDLEWARE = [
 # Убрать в проде
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8000',
+    "http://localhost:8000",
     "http://127.0.0.1:8000",
     "null",
 )
 
-CORS_ALLOW_HEADERS = default_headers + (
-    'Access-Control-Allow-Origin',
-)
+CORS_ALLOW_HEADERS = default_headers + ("Access-Control-Allow-Origin",)
 
 
 ROOT_URLCONF = "backend.urls"
@@ -105,7 +101,9 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
+        "ENGINE": os.getenv(
+            "DB_ENGINE", default="django.db.backends.postgresql"
+        ),
         "NAME": os.getenv("DB_NAME", default="postgres"),
         "USER": os.getenv("POSTGRES_USER", default="postgres"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
@@ -188,9 +186,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-INTERNAL_IPS = (
-    os.getenv("LOCALHOSTIP"),
-)
+INTERNAL_IPS = (os.getenv("LOCALHOSTIP"),)
 
 CSRF_TRUSTED_ORIGINS = (
     "http://" + DOMAIN,
@@ -201,11 +197,13 @@ AUTH_USER_MODEL = "users.CustomUser"
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 
 ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", default="friends-locator@yandex.ru")
+EMAIL_HOST_USER = os.getenv(
+    "EMAIL_HOST_USER", default="friends-locator@yandex.ru"
+)
 
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
