@@ -56,6 +56,14 @@ In the repository settings on GitHub, create environment variables in the Settin
 - POSTGRES_PASSWORD=... # password to connect to the database (set your own)
 - DB_HOST=db # name of the service (container)
 - DB_PORT=5432 # port to connect to the database
+- EMAIL_HOST_USER=friends-locator@yandex.ru
+- ELASTICEMAIL_API_KEY=... # email integration key
+- LOCALHOST=localhost
+- LOCALHOST_IP=127.0.0.1
+- CONTAINER_NAME=... # name of your container
+- DOMAIN=flap.acceleratorpracticum.ru
+- SERVER_IP=... # IP of your server
+- EVERYONE=0.0.0.0
 
 ## Docker:
 1. This app's using external volume for DB so before you start you should create this volume:
@@ -117,3 +125,6 @@ https://github.com/ggastly
 
 Antonevich Fedor
 https://github.com/LevityLoveLight
+
+Smirnov Alexey
+https://github.com/AxelVonReems
