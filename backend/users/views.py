@@ -1,23 +1,21 @@
 import requests
-from django.contrib.auth import get_user_model
-from django_filters.rest_framework import DjangoFilterBackend
+from django.conf import settings
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.status import (
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-    HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST,
-)
-from users.models import FriendsRelationship, FriendsRequest
-from users.serializers import CustomUserSerializer, FriendSerializer
+from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
+                                   HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
 
-User = get_user_model()
+from .models import CustomUser as User
+from .models import FriendsRelationship, FriendsRequest
+from .serializers import (CoordinateSerializer, CustomUserSerializer,
+                          FriendSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -142,6 +140,51 @@ class CustomUserViewSet(UserViewSet):
         )
         return Response(serializer.data, status=HTTP_200_OK)
 
+    @action(
+        methods=["patch"],
+        detail=True,
+        permission_classes=(IsAuthenticated,),
+        url_path="update-coordinates",
+    )
+    def update_coordinates(self, request, **kwargs):
+        user = get_object_or_404(User, id=self.kwargs.get("id"))
+        serializer = CoordinateSerializer(
+            user,
+            partial=True,
+            data=self.request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(data=serializer.data, status=HTTP_201_CREATED)
+
+    @action(
+        methods=["get"],
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+        url_path="get-friends",
+    )
+    def get_friends(self, request, **kwargs):
+        friends = request.user.friends.all()
+        nearby_friends = friends.filter(
+            longitude__gte=self.request.data["start_longitude"],
+            longitude__lte=self.request.data["end_longitude"],
+            latitude__gte=self.request.data["start_latitude"],
+            latitude__lte=self.request.data["end_latitude"],
+        )
+        serializer = FriendSerializer(
+            data=nearby_friends,
+            many=True,
+            context={"request": request},
+        )
+        serializer.is_valid()
+        if len(serializer.data) == 0:
+            return Response(serializer.data, status=HTTP_204_NO_CONTENT)
+        return Response(serializer.data, status=HTTP_200_OK)
+
 
 class ActivateUserView(GenericAPIView):
     """Подтверждение мейла."""
@@ -150,26 +193,9 @@ class ActivateUserView(GenericAPIView):
 
     def get(self, request, uid, token, format=None):
         """Отправка POST вместо GET."""
-        print(request)
-        payload = {'uid': uid, 'token': token}
-        actiavtion_url = "http://localhost:8000/api/v1/users/activation/"
+        payload = {"uid": uid, "token": token}
+        actiavtion_url = settings.ACTIVATION_URL
         response = requests.post(actiavtion_url, data=payload)
         if response.status_code == 204:
-            return Response({}, response.status_code)
-        return Response(response.json())
-
-
-class ResetPasswordView(GenericAPIView):
-    """Подтверждение мейла."""
-
-    permission_classes = [AllowAny]
-
-    def get(self, request, uid, token, format=None):
-        """Отправка POST вместо GET."""
-        print(request)
-        payload = {'uid': uid, 'token': token}
-        url = "http://localhost:8000/api/v1/users/reset_password_confirm/"
-        response = requests.post(url, data=payload)
-        if response.status_code == 204:
-            return Response({}, response.status_code)
+            return HttpResponseRedirect(redirect_to=settings.LOGIN_URL_)
         return Response(response.json())

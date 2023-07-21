@@ -65,6 +65,7 @@ In the repository settings on GitHub, create environment variables in the Settin
 - SERVER_IP=... # IP of your server
 - EVERYONE=0.0.0.0
 
+
 ## Docker:
 1. This app's using external volume for DB so before you start you should create this volume:
     #### docker volume create --name=pg_volume

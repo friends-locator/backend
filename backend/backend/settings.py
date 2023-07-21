@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from corsheaders.defaults import default_headers
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,12 +17,12 @@ SECRET_KEY = os.getenv(
 DEBUG = True
 
 ALLOWED_HOSTS = (
-    "localhost",
-    "backend",
-    "127.0.0.1",
-    "flap.acceleratorpracticum.ru",
-    "80.87.106.172",
-    "0.0.0.0",
+    os.getenv("LOCALHOST"),
+    os.getenv("LOCALHOST_IP"),
+    os.getenv("CONTAINER_NAME"),
+    os.getenv("DOMAIN"),
+    os.getenv("SERVER_IP"),
+    os.getenv("EVERYONE"),
 )
 
 
@@ -39,14 +40,17 @@ INSTALLED_APPS = [
     "djoser",
     "colorfield",
     "django_filters",
+    "drf_yasg",
 
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
-    "elasticemailbackend"
+    "elasticemailbackend",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -55,6 +59,19 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Убрать в проде
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8000',
+    "http://127.0.0.1:8000",
+    "null",
+)
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'Access-Control-Allow-Origin',
+)
+
 
 ROOT_URLCONF = "backend.urls"
 
@@ -88,9 +105,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv(
-            "DB_ENGINE", default="django.db.backends.postgresql"
-        ),
+        "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
         "NAME": os.getenv("DB_NAME", default="postgres"),
         "USER": os.getenv("POSTGRES_USER", default="postgres"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
@@ -113,8 +128,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
+    {
+        "NAME": "users.validators.MaximumLengthValidator",
+    },
 ]
 
+NAME_REGEX_PATTERN = r"[А-Яа-яA-Za-z ]+"
 
 LANGUAGE_CODE = "ru"
 
@@ -132,17 +151,28 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 REST_FRAMEWORK = {
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle"
+    ),
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "60/min",
+    },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated"
-    ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ],
+    ),
 }
 
-DOMAIN = "flap.acceleratorpracticum.ru"
-SITE_NAME = "flap.acceleratorpracticum.ru"
+DOMAIN = os.getenv("DOMAIN")
+SITE_NAME = DOMAIN
+ACTIVATION_URL = os.getenv("ACTIVATION_URL")
+LOGIN_URL_ = os.getenv("LOGIN_URL_")
+
 
 DJOSER = {
     "HIDE_USERS": False,
@@ -167,10 +197,15 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-INTERNAL_IPS = ("127.0.0.1",)
-CSRF_TRUSTED_ORIGINS = ("http://flap.acceleratorpracticum.ru", "https://flap.acceleratorpracticum.ru",)
-AUTH_USER_MODEL = "users.CustomUser"
+INTERNAL_IPS = (
+    os.getenv("LOCALHOSTIP"),
+)
 
+CSRF_TRUSTED_ORIGINS = (
+    "http://" + DOMAIN,
+    "https://" + DOMAIN,
+)
+AUTH_USER_MODEL = "users.CustomUser"
 
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 
