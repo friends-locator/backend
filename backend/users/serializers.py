@@ -1,10 +1,25 @@
+import base64
 from re import match
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework.serializers import (CurrentUserDefault, HiddenField,
+                                        ImageField, ModelSerializer,
+                                        ValidationError)
 
-from .models import CustomUser as User
+from users.models import CustomUser as User
+
+
+class Base64ImageField(ImageField):
+    """Класс для добавления добавления аватара при создании пользователя."""
+
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith("data:image"):
+            format, imgstr = data.split(";base64,")
+            ext = format.split("/")[-1]
+            data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
+        return super().to_internal_value(data)
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -47,6 +62,21 @@ class CustomUserSerializer(UserSerializer):
             "longitude",
             "latitude",
         )
+
+
+class UserpicSerializer(ModelSerializer):
+    """Кастомный сериализатор для работы с аватаром пользователя."""
+
+    user = HiddenField(default=CurrentUserDefault())
+    userpic = Base64ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "user",
+            "userpic",
+        )
+    read_only_fields = ("user",)
 
 
 class FriendSerializer(ModelSerializer):

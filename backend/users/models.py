@@ -140,7 +140,7 @@ class CustomUser(AbstractUser):
         verbose_name=_("Статус"),
         help_text=_("Укажите статус"),
         default=1,
-        null=True
+        null=True,
     )
     gender = models.CharField(
         max_length=50,
