@@ -15,7 +15,7 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
 from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
-                          FriendSerializer)
+                          FriendSerializer, UserpicSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -184,6 +184,27 @@ class CustomUserViewSet(UserViewSet):
         if len(serializer.data) == 0:
             return Response(serializer.data, status=HTTP_204_NO_CONTENT)
         return Response(serializer.data, status=HTTP_200_OK)
+
+    @action(
+        methods=["patch"],
+        detail=True,
+        permission_classes=(IsAuthenticated,),
+        url_path="update-user-pic",
+    )
+    def update_user_pic(self, request, **kwargs):
+        user = request.user
+        serializer = UserpicSerializer(
+            user,
+            partial=True,
+            data=self.request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(data=serializer.data, status=HTTP_201_CREATED)
 
 
 class ActivateUserView(GenericAPIView):
