@@ -18,7 +18,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = (
     os.getenv("LOCALHOST"),
-    os.getenv("LOCALHOSTIP"),
+    os.getenv("LOCALHOST_IP"),
     os.getenv("CONTAINER_NAME"),
     os.getenv("DOMAIN"),
     os.getenv("SERVER_IP"),
@@ -206,3 +206,6 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", default="friends-locator@yandex.r
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
