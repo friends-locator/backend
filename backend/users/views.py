@@ -11,9 +11,9 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
 
 from .models import CustomUser as User
-from .models import FriendsRelationship, FriendsRequest, FriendsCategory
+from .models import FriendsCategory, FriendsRelationship, FriendsRequest
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
-                          FriendSerializer, FriendCategorySerializer,
+                          FriendCategorySerializer, FriendSerializer,
                           FriendsRelationshipSerializer)
 
 

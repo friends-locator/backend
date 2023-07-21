@@ -2,11 +2,11 @@ from re import match
 
 from django.conf import settings
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.serializers import (ModelSerializer, ValidationError,
-                                        SerializerMethodField)
+from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
+                                        ValidationError)
 
 from .models import CustomUser as User
-from .models import FriendsRelationship, FriendsCategory
+from .models import FriendsCategory, FriendsRelationship
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
-from users.models import (CustomUser, FriendsRequest,
-                          Status, Tag, FriendsRelationship,
-                          FriendsCategory)
+from users.models import (CustomUser, FriendsCategory,
+                          FriendsRelationship, FriendsRequest,
+                          Status, Tag)
 
 
 @admin.register(Tag)
