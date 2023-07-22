@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     # Сторонние либы
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt",
     "djoser",
     "colorfield",
     "django_filters",
@@ -44,10 +45,36 @@ INSTALLED_APPS = [
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
+    "social_django",
     "elasticemailbackend"
 ]
 
+SOCIAL_AUTH_JSONFIELD_CUSTOM = 'django.db.models.JSONField'
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.vk.VKOAuth2",
+    "social_auth.backends.google.GoogleOAuth2Backend",
+    # 'social_auth.backends.contrib.yandex.YandexOAuth2Backend',
+    # 'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
+    "django.contrib.auth.backends.ModelBackend",
+)
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.social_auth.associate_by_email',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
 MIDDLEWARE = [
+    "social_django.middleware.SocialAuthExceptionMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -62,7 +89,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -70,6 +97,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
             ],
         },
     },
@@ -78,26 +107,26 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#         "ATOMIC_REQUESTS": True,
-#     }
-# }
-
-# Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
-        "NAME": os.getenv("DB_NAME", default="postgres"),
-        "USER": os.getenv("POSTGRES_USER", default="postgres"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
-        "HOST": os.getenv("DB_HOST", default="db"),
-        "PORT": os.getenv("DB_PORT", default="5432"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
         "ATOMIC_REQUESTS": True,
     }
 }
+
+# Postgress
+# DATABASES = {
+#     "default": {
+#         "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
+#         "NAME": os.getenv("DB_NAME", default="postgres"),
+#         "USER": os.getenv("POSTGRES_USER", default="postgres"),
+#         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
+#         "HOST": os.getenv("DB_HOST", default="db"),
+#         "PORT": os.getenv("DB_PORT", default="5432"),
+#         "ATOMIC_REQUESTS": True,
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -128,6 +157,7 @@ STATIC_URL = "backend_static/"
 STATIC_ROOT = BASE_DIR / "backend_static"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['local_password',]
 
 
 REST_FRAMEWORK = {
@@ -175,6 +205,21 @@ CSRF_TRUSTED_ORIGINS = (
 )
 AUTH_USER_MODEL = "users.CustomUser"
 
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+
+SOCIAL_AUTH_VK_OAUTH2_KEY = "51708837"
+SOCIAL_AUTH_VK_OAUTH2_SECRET = "yQwp9EVrhiycVlqsE0AQ"
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = []
+SOCIAL_AUTH_VK_OAUTH2_EXTRA_DATA = ["first_name", "last_name"]
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '131366740845-sc7a64547ckb6bgn27ofgi0lmtjp1u6t.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid'
+]
+SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ['first_name', 'last_name']
 
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 

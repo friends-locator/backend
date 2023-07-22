@@ -61,8 +61,8 @@ class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, role=None, password=None, **others):
         if not email:
             raise ValueError(_("У пользователя должен быть указан email"))
-
-        validate_password(password)
+        if password != None:
+            validate_password(password)
 
         user = self.model(
             email=self.normalize_email(email), username=username, **others

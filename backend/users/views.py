@@ -1,7 +1,7 @@
 import requests
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -20,6 +20,7 @@ from users.serializers import (
     CustomUserSerializer,
     FriendSerializer,
 )
+from social_core.pipeline.partial import partial
 
 User = get_user_model()
 
@@ -205,3 +206,27 @@ class ActivateUserView(GenericAPIView):
         if response.status_code == 204:
             return Response({}, response.status_code)
         return Response(response.json())
+
+
+
+# partial says "we may interrupt, but we will come back here again"
+@partial
+def collect_password(strategy, backend, request, details, *args, **kwargs):
+    # session 'local_password' is set by the pipeline infrastructure
+    # because it exists in FIELDS_STORED_IN_SESSION
+    local_password = strategy.session_get('local_password', None)
+    if not local_password:
+        # if we return something besides a dict or None, then that is
+        # returned to the user -- in this case we will redirect to a
+        # view that can be used to get a password
+        return redirect("views.collect_password")
+
+    # grab the user object from the database (remember that they may
+    # not be logged in yet) and set their password.  (Assumes that the
+    # email address was captured in an earlier step.)
+    user = get_object_or_404(User, email=kwargs['email'])
+    user.set_password(local_password)
+    user.save() 
+
+    # continue the pipeline
+    return

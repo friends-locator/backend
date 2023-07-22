@@ -31,6 +31,7 @@ urlpatterns = [
     path("v1/", include(router.urls)),
     path("v1/", include("djoser.urls")),
     path("v1/", include("djoser.urls.jwt")),
+    path("v1/", include("djoser.social.urls")),
     path("account-activate/<uid>/<token>/", ActivateUserView.as_view()),
 ]
 
