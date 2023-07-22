@@ -15,7 +15,8 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
 from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
-                          FriendSerializer, UserpicSerializer)
+                          FriendSerializer, UserpicSerializer,
+                          UserStatusSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -195,6 +196,25 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
         serializer = UserpicSerializer(
             user,
+            partial=True,
+            data=self.request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(data=serializer.data, status=HTTP_201_CREATED)
+
+    @action(
+        methods=["patch"],
+        detail=True,
+        url_path="update-user-status",
+    )
+    def update_user_status(self, request, **kwargs):
+        serializer = UserStatusSerializer(
+            request.user,
             partial=True,
             data=self.request.data,
             context={"request": request},

@@ -61,6 +61,8 @@ class CustomUserSerializer(UserSerializer):
             "last_name",
             "longitude",
             "latitude",
+            "status",
+            "userpic",
         )
 
 
@@ -76,6 +78,7 @@ class UserpicSerializer(ModelSerializer):
             "user",
             "userpic",
         )
+
     read_only_fields = ("user",)
 
 
@@ -119,3 +122,17 @@ class CoordinateSerializer(ModelSerializer):
                 "Требуется передавать оба параметра широты и долготы."
             )
         return data
+
+
+class UserStatusSerializer(ModelSerializer):
+    """Сериализатор для обновления статуса пользователя."""
+
+    user = HiddenField(default=CurrentUserDefault())
+
+    class Meta:
+        model = User
+        fields = (
+            "user",
+            "status",
+        )
+        read_only_fields = ("user",)
