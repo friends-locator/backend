@@ -26,7 +26,7 @@ ALLOWED_HOSTS = (
 )
 
 
-INSTALLED_APPS = [
+INSTALLED_APPS = (
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,15 +41,16 @@ INSTALLED_APPS = [
     "colorfield",
     "django_filters",
     "drf_yasg",
+    "corsheaders",
+    "elasticemailbackend",
 
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
-    "elasticemailbackend",
-    "corsheaders",
-]
+    "places.apps.PlacesConfig",
+)
 
-MIDDLEWARE = [
+MIDDLEWARE = (
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -58,7 +59,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
+)
 
 # Убрать в проде
 CORS_ORIGIN_ALLOW_ALL = True
@@ -115,7 +116,7 @@ DATABASES = {
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = [
+AUTH_PASSWORD_VALIDATORS = (
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
@@ -131,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "users.validators.MaximumLengthValidator",
     },
-]
+)
 
 NAME_REGEX_PATTERN = r"[А-Яа-яA-Za-z ]+"
 
