@@ -24,7 +24,7 @@ class PlacesViewSet(viewsets.ModelViewSet):
     )
     def share_place(self, request, **kwargs):
         sharing_place = self.kwargs.get("pk")
-        sharing_to_user = request.data.get("to_user")
+        sharing_to_user = request.data.get("sharing_to_user")
         data = {
             "sharing_place": sharing_place,
             "sharing_to_user": sharing_to_user,
@@ -46,7 +46,7 @@ class PlacesViewSet(viewsets.ModelViewSet):
     )
     def stop_sharing_place(self, request, **kwargs):
         sharing_place = self.kwargs.get("pk")
-        sharing_to_user = request.data.get("to_user")
+        sharing_to_user = request.data.get("sharing_to_user")
 
         place = SharedPlaces.objects.filter(
             sharing_place=sharing_place,
