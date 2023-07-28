@@ -159,6 +159,15 @@ class CustomUser(AbstractUser):
 class FriendsRelationship(models.Model):
     """Промежуточная/вспомогательная таблица юзер-друзья."""
 
+    NONE_CATEGORY = "none_category"
+    FRIENDS = "friends"
+    FAMILY = "family"
+    CATEGORY_CHOICES = [
+        (NONE_CATEGORY, "Без категории"),
+        (FRIENDS, "Близкие друзья"),
+        (FAMILY, "Семья"),
+    ]
+
     current_user = models.ForeignKey(
         CustomUser,
         verbose_name=_("Текущий пользователь"),
@@ -170,6 +179,13 @@ class FriendsRelationship(models.Model):
         verbose_name=_("Друг"),
         related_name="friend",
         on_delete=models.CASCADE,
+    )
+    friend_category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        verbose_name=_("Название категории"),
+        help_text=_("Укажите категорию друга"),
+        default=NONE_CATEGORY
     )
 
     class Meta:
