@@ -157,8 +157,8 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle"
     ),
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "60/min",
-        "user": "60/min",
+        "anon": "120/min",
+        "user": "120/min",
     },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "DEFAULT_PERMISSION_CLASSES": (
