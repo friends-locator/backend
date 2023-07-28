@@ -157,8 +157,8 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle"
     ),
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "60/min",
-        "user": "60/min",
+        "anon": "120/min",
+        "user": "120/min",
     },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "DEFAULT_PERMISSION_CLASSES": (
@@ -174,6 +174,8 @@ SITE_NAME = DOMAIN
 ACTIVATION_URL = os.getenv("ACTIVATION_URL")
 LOGIN_URL_ = os.getenv("LOGIN_URL_")
 
+# Чтобы POST/PATCH можно было без слэша в конце юзать
+# APPEND_SLASH = False
 
 DJOSER = {
     "HIDE_USERS": False,
