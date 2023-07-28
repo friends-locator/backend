@@ -1,4 +1,5 @@
 import requests
+from django.db.models import F
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -15,7 +16,8 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
 from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
-                          FriendSerializer, UserpicSerializer)
+                          FriendSerializer, FriendsRelationshipSerializer,
+                          UserpicSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -25,12 +27,20 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
     pagination_class = None
     filter_backends = (DjangoFilterBackend, SearchFilter)
-    filterset_fields = ("tags",)
+    filterset_fields = ("tags", "friends_category",)
     search_fields = ("^email",)
 
-    @action(detail=False)
     def friends(self, request):
-        friends = request.user.friends.all()
+        query_param = self.request.GET.get('friends_category')
+        if query_param:
+            friends = request.user.friends.filter(
+                friend__friend_category=query_param
+            ).annotate(friend_category=F('friend__friend_category'))
+            print(friends)
+        else:
+            friends = request.user.friends.all().annotate(
+                friend_category=F('friend__friend_category')
+            )
         serializer = FriendSerializer(
             friends, many=True, context={"request": request}
         )
@@ -184,6 +194,32 @@ class CustomUserViewSet(UserViewSet):
         if len(serializer.data) == 0:
             return Response(serializer.data, status=HTTP_204_NO_CONTENT)
         return Response(serializer.data, status=HTTP_200_OK)
+
+    @action(
+        methods=["patch"],
+        detail=True,
+        url_path="update-friends-category",
+    )
+    def update_friends_category(self, request, **kwargs):
+        current_user = request.user
+        friend = get_object_or_404(User, id=self.kwargs.get("id"))
+        friendship_bond = FriendsRelationship.objects.get(
+            current_user=current_user,
+            friend=friend
+        )
+        serializer = FriendsRelationshipSerializer(
+            friendship_bond,
+            partial=True,
+            data=self.request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                {"Fail": "Передано некорректное наименование категории"},
+                status=HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(data=serializer.data, status=HTTP_201_CREATED)
 
     @action(
         methods=["patch"],
