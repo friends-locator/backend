@@ -16,7 +16,7 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
 from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
-                          FriendSerializer, FriendsRelationshipSerializer
+                          FriendSerializer, FriendsRelationshipSerializer,
                           UserpicSerializer)
 
 
@@ -27,12 +27,20 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
     pagination_class = None
     filter_backends = (DjangoFilterBackend, SearchFilter)
-    filterset_fields = ("tags",)
+    filterset_fields = ("tags", "friends_category",)
     search_fields = ("^email",)
 
-    @action(detail=False)
     def friends(self, request):
-        friends = request.user.friends.all()
+        query_param = self.request.GET.get('friends_category')
+        if query_param:
+            friends = request.user.friends.filter(
+                friend__friend_category=query_param
+            ).annotate(friend_category=F('friend__friend_category'))
+            print(friends)
+        else:
+            friends = request.user.friends.all().annotate(
+                friend_category=F('friend__friend_category')
+            )
         serializer = FriendSerializer(
             friends, many=True, context={"request": request}
         )

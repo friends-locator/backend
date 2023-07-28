@@ -4,7 +4,11 @@ from re import match
 from django.conf import settings
 from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
+                                        ValidationError)
+
+from .models import CustomUser as User
+from .models import FriendsRelationship
 
 
 class Base64ImageField(ImageField):
@@ -75,8 +79,20 @@ class UserpicSerializer(ModelSerializer):
     read_only_fields = ("user",)
 
 
+class FriendsRelationshipSerializer(ModelSerializer):
+    """Кастомный сериализатор для работы с дружескими связями."""
+    class Meta:
+        model = FriendsRelationship
+        fields = (
+            "current_user",
+            "friend",
+            "friend_category",
+        )
+
+
 class FriendSerializer(ModelSerializer):
     """Кастомный сериализатор для работы с друзьями."""
+    friend_category = SerializerMethodField()
 
     class Meta:
         model = User
