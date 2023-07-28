@@ -6,7 +6,7 @@ from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
                                         ValidationError)
 
 from .models import CustomUser as User
-from .models import FriendsCategory, FriendsRelationship
+from .models import FriendsRelationship
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -51,16 +51,6 @@ class CustomUserSerializer(UserSerializer):
         )
 
 
-class FriendCategorySerializer(ModelSerializer):
-    """Кастомный сериализатор для работы с категориями друзей."""
-    class Meta:
-        model = FriendsCategory
-        fields = (
-            "id",
-            "name",
-        )
-
-
 class FriendsRelationshipSerializer(ModelSerializer):
     """Кастомный сериализатор для работы с дружескими связями."""
     class Meta:
@@ -98,13 +88,8 @@ class FriendSerializer(ModelSerializer):
             "friend_category",
         )
 
-    def get_friend_category(self, obj):
-        friend_id = getattr(obj, "id")
-        friend_data = FriendsRelationship.objects.get(friend_id=friend_id)
-        category = FriendsCategory.objects.get(
-            pk=friend_data.friend_category_id
-        )
-        return category.name
+    def get_friend_category(self, data):
+        return data.friend_category
 
 
 class CoordinateSerializer(ModelSerializer):

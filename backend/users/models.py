@@ -50,35 +50,6 @@ class Tag(models.Model):
         return self.name
 
 
-class FriendsCategory(models.Model):
-    """Модель категорий друзей"""
-
-    NONE_CATEGORY = "none_category"
-    FRIENDS = "friends"
-    FAMILY = "family"
-    CATEGORY_CHOICES = [
-        (NONE_CATEGORY, "Без категории"),
-        (FRIENDS, "Друзья"),
-        (FAMILY, "Семья"),
-    ]
-
-    name = models.CharField(
-        max_length=50,
-        choices=CATEGORY_CHOICES,
-        verbose_name=_("Название категории"),
-        help_text=_("Укажите категорию друга"),
-        unique=True
-    )
-
-    class Meta:
-        ordering = ("name",)
-        verbose_name = _("Категория")
-        verbose_name_plural = _("Категории")
-
-    def __str__(self):
-        return self.name
-
-
 class CustomUserManager(BaseUserManager):
     """Кастомный менеджер юзеров."""
 
@@ -214,6 +185,15 @@ class CustomUser(AbstractUser):
 class FriendsRelationship(models.Model):
     """Промежуточная/вспомогательная таблица юзер-друзья."""
 
+    NONE_CATEGORY = "none_category"
+    FRIENDS = "friends"
+    FAMILY = "family"
+    CATEGORY_CHOICES = [
+        (NONE_CATEGORY, "Без категории"),
+        (FRIENDS, "Близкие друзья"),
+        (FAMILY, "Семья"),
+    ]
+
     current_user = models.ForeignKey(
         CustomUser,
         verbose_name=_("Текущий пользователь"),
@@ -226,13 +206,12 @@ class FriendsRelationship(models.Model):
         related_name="friend",
         on_delete=models.CASCADE,
     )
-    friend_category = models.ForeignKey(
-        FriendsCategory,
-        on_delete=models.CASCADE,
-        related_name="friend_category",
-        verbose_name=_("Категория друга"),
-        help_text=_("Выберите категорию друга"),
-        default=1,
+    friend_category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        verbose_name=_("Название категории"),
+        help_text=_("Укажите категорию друга"),
+        default=NONE_CATEGORY
     )
 
     class Meta:

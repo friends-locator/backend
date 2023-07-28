@@ -1,4 +1,5 @@
 import requests
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
@@ -11,10 +12,9 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
 
 from .models import CustomUser as User
-from .models import FriendsCategory, FriendsRelationship, FriendsRequest
+from .models import FriendsRelationship, FriendsRequest
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
-                          FriendCategorySerializer, FriendSerializer,
-                          FriendsRelationshipSerializer)
+                          FriendSerializer, FriendsRelationshipSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -24,18 +24,21 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
     pagination_class = None
     filter_backends = (DjangoFilterBackend, SearchFilter)
-    filterset_fields = ("tags", "friends_category_id",)
+    filterset_fields = ("tags", "friends_category",)
     search_fields = ("^email",)
 
     @action(detail=False)
     def friends(self, request):
-        query_param = self.request.GET.get('friends_category_id')
+        query_param = self.request.GET.get('friends_category')
         if query_param:
             friends = request.user.friends.filter(
-                friend__friend_category_id=query_param
-            )
+                friend__friend_category=query_param
+            ).annotate(friend_category=F('friend__friend_category'))
+            print(friends)
         else:
-            friends = request.user.friends.all()
+            friends = request.user.friends.all().annotate(
+                friend_category=F('friend__friend_category')
+            )
         serializer = FriendSerializer(
             friends, many=True, context={"request": request}
         )
@@ -191,22 +194,8 @@ class CustomUserViewSet(UserViewSet):
         return Response(serializer.data, status=HTTP_200_OK)
 
     @action(
-        methods=["get"],
-        detail=False,
-        permission_classes=(IsAuthenticated,),
-        url_path="categories",
-    )
-    def categories(self, request):
-        categories = FriendsCategory.objects.all()
-        serializer = FriendCategorySerializer(
-            categories, many=True, context={"request": request}
-        )
-        return Response(serializer.data, status=HTTP_200_OK)
-
-    @action(
         methods=["patch"],
         detail=True,
-        permission_classes=(IsAuthenticated,),
         url_path="update-friends-category",
     )
     def update_friends_category(self, request, **kwargs):
@@ -224,7 +213,7 @@ class CustomUserViewSet(UserViewSet):
         )
         if not serializer.is_valid():
             return Response(
-                {"Fail": "Передан некорректный id категории"},
+                {"Fail": "Передано некорректное наименование категории"},
                 status=HTTP_400_BAD_REQUEST
             )
         serializer.save()
