@@ -34,7 +34,6 @@ class CustomUserViewSet(UserViewSet):
             friends = request.user.friends.filter(
                 friend__friend_category=query_param
             ).annotate(friend_category=F('friend__friend_category'))
-            print(friends)
         else:
             friends = request.user.friends.all().annotate(
                 friend_category=F('friend__friend_category')
