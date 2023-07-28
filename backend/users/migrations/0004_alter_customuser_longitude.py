@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     dependencies = [
         (
             "users",
-            "0002_remove_friendsrequest_users_friendsrequest_unique_relationships_and_more",
+            "0003_alter_customuser_email",
         ),
     ]
 
