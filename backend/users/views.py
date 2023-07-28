@@ -251,8 +251,8 @@ class ActivateUserView(GenericAPIView):
     def get(self, request, uid, token, format=None):
         """Отправка POST вместо GET."""
         payload = {"uid": uid, "token": token}
-        actiavtion_url = "http://localhost:8000/api/v1/users/activation/"
+        actiavtion_url = settings.ACTIVATION_URL
         response = requests.post(actiavtion_url, data=payload)
         if response.status_code == 204:
-            return Response({}, response.status_code)
+            return HttpResponseRedirect(redirect_to=settings.LOGIN_URL_)
         return Response(response.json())

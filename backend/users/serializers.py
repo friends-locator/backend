@@ -4,8 +4,9 @@ from re import match
 from django.conf import settings
 from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
-                                        ValidationError)
+from rest_framework.serializers import (CurrentUserDefault, HiddenField,
+                                        ImageField, ModelSerializer,
+                                        SerializerMethodField, ValidationError)
 
 from .models import CustomUser as User
 from .models import FriendsRelationship
