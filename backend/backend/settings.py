@@ -18,7 +18,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = (
     os.getenv("LOCALHOST"),
-    os.getenv("LOCALHOSTIP"),
+    os.getenv("LOCALHOST_IP"),
     os.getenv("CONTAINER_NAME"),
     os.getenv("DOMAIN"),
     os.getenv("SERVER_IP"),
@@ -26,7 +26,7 @@ ALLOWED_HOSTS = (
 )
 
 
-INSTALLED_APPS = [
+INSTALLED_APPS = (
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,15 +41,16 @@ INSTALLED_APPS = [
     "colorfield",
     "django_filters",
     "drf_yasg",
+    "corsheaders",
+    "elasticemailbackend",
 
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
-    "elasticemailbackend",
-    "corsheaders",
-]
+    "places.apps.PlacesConfig",
+)
 
-MIDDLEWARE = [
+MIDDLEWARE = (
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -58,19 +59,17 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
+)
 
 # Убрать в проде
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8000',
+    "http://localhost:8000",
     "http://127.0.0.1:8000",
     "null",
 )
 
-CORS_ALLOW_HEADERS = default_headers + (
-    'Access-Control-Allow-Origin',
-)
+CORS_ALLOW_HEADERS = default_headers + ("Access-Control-Allow-Origin",)
 
 
 ROOT_URLCONF = "backend.urls"
@@ -105,7 +104,9 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
+        "ENGINE": os.getenv(
+            "DB_ENGINE", default="django.db.backends.postgresql"
+        ),
         "NAME": os.getenv("DB_NAME", default="postgres"),
         "USER": os.getenv("POSTGRES_USER", default="postgres"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
@@ -115,7 +116,7 @@ DATABASES = {
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = [
+AUTH_PASSWORD_VALIDATORS = (
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
@@ -131,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "users.validators.MaximumLengthValidator",
     },
-]
+)
 
 NAME_REGEX_PATTERN = r"[А-Яа-яA-Za-z ]+"
 
@@ -151,19 +152,28 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": (
-        "rest_framework.pagination.PageNumberPagination"
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle"
     ),
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated"
-    ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+        "user": "60/min",
+    },
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ],
+    ),
 }
 
 DOMAIN = os.getenv("DOMAIN")
 SITE_NAME = DOMAIN
+ACTIVATION_URL = os.getenv("ACTIVATION_URL")
+LOGIN_URL_ = os.getenv("LOGIN_URL_")
+
 
 DJOSER = {
     "HIDE_USERS": False,
@@ -201,8 +211,13 @@ AUTH_USER_MODEL = "users.CustomUser"
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 
 ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", default="friends-locator@yandex.ru")
+EMAIL_HOST_USER = os.getenv(
+    "EMAIL_HOST_USER", default="friends-locator@yandex.ru"
+)
 
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

@@ -1,5 +1,7 @@
 import requests
 from django.db.models import F
+from django.conf import settings
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
@@ -14,7 +16,8 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
 from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
-                          FriendSerializer, FriendsRelationshipSerializer)
+                          FriendSerializer, FriendsRelationshipSerializer
+                          UserpicSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -24,20 +27,12 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
     pagination_class = None
     filter_backends = (DjangoFilterBackend, SearchFilter)
-    filterset_fields = ("tags", "friends_category",)
+    filterset_fields = ("tags",)
     search_fields = ("^email",)
 
     @action(detail=False)
     def friends(self, request):
-        query_param = self.request.GET.get('friends_category')
-        if query_param:
-            friends = request.user.friends.filter(
-                friend__friend_category=query_param
-            ).annotate(friend_category=F('friend__friend_category'))
-        else:
-            friends = request.user.friends.all().annotate(
-                friend_category=F('friend__friend_category')
-            )
+        friends = request.user.friends.all()
         serializer = FriendSerializer(
             friends, many=True, context={"request": request}
         )
@@ -214,6 +209,27 @@ class CustomUserViewSet(UserViewSet):
             return Response(
                 {"Fail": "Передано некорректное наименование категории"},
                 status=HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(data=serializer.data, status=HTTP_201_CREATED)
+
+    @action(
+        methods=["patch"],
+        detail=True,
+        permission_classes=(IsAuthenticated,),
+        url_path="update-user-pic",
+    )
+    def update_user_pic(self, request, **kwargs):
+        user = request.user
+        serializer = UserpicSerializer(
+            user,
+            partial=True,
+            data=self.request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
             )
         serializer.save()
         return Response(data=serializer.data, status=HTTP_201_CREATED)
