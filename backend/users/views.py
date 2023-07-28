@@ -17,7 +17,7 @@ from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
                           FriendSerializer, FriendsRelationshipSerializer,
-                          UserpicSerializer)
+                          UserpicSerializer, UserStatusSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -27,16 +27,16 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
     pagination_class = None
     filter_backends = (DjangoFilterBackend, SearchFilter)
-    filterset_fields = ("tags", "friends_category",)
+    filterset_fields = ("tags",)
     search_fields = ("^email",)
 
+    @action(detail=False)
     def friends(self, request):
         query_param = self.request.GET.get('friends_category')
         if query_param:
             friends = request.user.friends.filter(
                 friend__friend_category=query_param
             ).annotate(friend_category=F('friend__friend_category'))
-            print(friends)
         else:
             friends = request.user.friends.all().annotate(
                 friend_category=F('friend__friend_category')
@@ -231,6 +231,25 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
         serializer = UserpicSerializer(
             user,
+            partial=True,
+            data=self.request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(data=serializer.data, status=HTTP_201_CREATED)
+
+    @action(
+        methods=["patch"],
+        detail=True,
+        url_path="update-user-status",
+    )
+    def update_user_status(self, request, **kwargs):
+        serializer = UserStatusSerializer(
+            request.user,
             partial=True,
             data=self.request.data,
             context={"request": request},
