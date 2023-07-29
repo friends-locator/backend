@@ -1,6 +1,6 @@
 import requests
-from django.db.models import F
 from django.conf import settings
+from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -11,7 +11,8 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
-                                   HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
+                                   HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST,
+                                   HTTP_500_INTERNAL_SERVER_ERROR)
 
 from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
@@ -32,14 +33,14 @@ class CustomUserViewSet(UserViewSet):
 
     @action(detail=False)
     def friends(self, request):
-        query_param = self.request.GET.get('friends_category')
+        query_param = self.request.GET.get("friends_category")
         if query_param:
             friends = request.user.friends.filter(
                 friend__friend_category=query_param
-            ).annotate(friend_category=F('friend__friend_category'))
+            ).annotate(friend_category=F("friend__friend_category"))
         else:
             friends = request.user.friends.all().annotate(
-                friend_category=F('friend__friend_category')
+                friend_category=F("friend__friend_category")
             )
         serializer = FriendSerializer(
             friends, many=True, context={"request": request}
@@ -204,8 +205,7 @@ class CustomUserViewSet(UserViewSet):
         current_user = request.user
         friend = get_object_or_404(User, id=self.kwargs.get("id"))
         friendship_bond = FriendsRelationship.objects.get(
-            current_user=current_user,
-            friend=friend
+            current_user=current_user, friend=friend
         )
         serializer = FriendsRelationshipSerializer(
             friendship_bond,
@@ -216,7 +216,7 @@ class CustomUserViewSet(UserViewSet):
         if not serializer.is_valid():
             return Response(
                 {"Fail": "Передано некорректное наименование категории"},
-                status=HTTP_400_BAD_REQUEST
+                status=HTTP_400_BAD_REQUEST,
             )
         serializer.save()
         return Response(data=serializer.data, status=HTTP_201_CREATED)
@@ -263,15 +263,26 @@ class CustomUserViewSet(UserViewSet):
 
 
 class ActivateUserView(GenericAPIView):
-    """Подтверждение мейла."""
+    """Подтверждение почты."""
 
     permission_classes = [AllowAny]
 
-    def get(self, request, uid, token, format=None):
-        """Отправка POST вместо GET."""
+    @staticmethod
+    def get(request, uid, token):
+        """Отправка POST вместо GET на стандартный эндпоинт подтверждения."""
         payload = {"uid": uid, "token": token}
-        actiavtion_url = settings.ACTIVATION_URL
-        response = requests.post(actiavtion_url, data=payload)
-        if response.status_code == 204:
-            return HttpResponseRedirect(redirect_to=settings.LOGIN_URL_)
-        return Response(response.json())
+        activation_url = settings.ACTIVATION_URL
+
+        try:
+            response = requests.post(activation_url, data=payload)
+
+            if response.status_code == HTTP_204_NO_CONTENT:
+                return HttpResponseRedirect(redirect_to=settings.LOGIN_URL_)
+            else:
+                return Response(response.json(), status=response.status_code)
+
+        except requests.RequestException:
+            return Response(
+                {"error": "Failed to activate user."},
+                status=HTTP_500_INTERNAL_SERVER_ERROR,
+            )

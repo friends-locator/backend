@@ -5,8 +5,8 @@ from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 
 from api.views import TagViewSet
-from users.views import ActivateUserView, CustomUserViewSet
 from places.views import PlacesViewSet
+from users.views import ActivateUserView, CustomUserViewSet
 
 app_name = "api"
 

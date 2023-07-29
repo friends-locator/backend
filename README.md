@@ -1,116 +1,236 @@
-# Where are my friends?
+# Где мои друзья?
 
-
-### Link for the website:
+## Демо
 
 https://flap.acceleratorpracticum.ru/
 
+## Оглавление
 
-### Project description:
+- [Описание](#description)
+- [Стек технологий](#stack)
+- [Особенности](#features)
+- [Настройки](#settings)
+- [Руководство для запуска на удаленном сервере](#howto-remote)
+- [Руководство для разработчиков](#howto-dev)
+- [Авторы](#authors)
 
-Web application for finding friends on the map. Here people can search and add new friends, share their geolocation and see the location of a friend, gather for fun meetings and have a great time.
+## <a id="description"></a> Описание
 
+Данное веб-приложение предназначено для поиска друзей на карте.
+Здесь люди могут искать и добавлять новых друзей, делиться своим местоположением,
+просматривать местоположение своих друзей, устраивать встречи и приятно проводить
+время вместе.
 
-Used technologies:
--
-    - python 3.11
-    - django 4.1
-    - djangorestframework 3.14
-    - python-dotenv 0.21.1
-    - django-filter 22.1
-    - PostgreSQL 13.0
-    - Docker
+## <a id="stack"></a> Стек технологий
 
+* Python 3.11
+* Django 4.1
+* Django REST framework 3.14
+* python-dotenv 0.21.1
+* django-filter 22.1
+* PostgreSQL 13.0
+* Docker
 
-Features:
--
-    - You can search and add new friends
-    - You can view your friends location
-    - You can invite new friends
-    - You can accept friend requests
-    - You can remove users from friends
-    - Admin-zone
+## <a id="features"></a> Особенности
 
+* Поиск и добавление новых друзей
+* Просмотр местоположения ваших друзей
+* Приглашение новых друзей
+* Подтверждение запросов на добавление в друзья
+* Удаление пользователей из списка друзей
+* Администрирование учетных записей
 
-# Launch instructions:
+## <a id="settings"></a> Настройки
 
-Copy the docker-compose.yml and nginx.conf files from the infra folder to the remote server:
+Все возможные настройки приложения указаны в файле .env.template.
+Этот файл содержит шаблон для переменных окружения,
+которые можно настроить согласно требованиям вашей установки.
+
+# <a id="howto-remote"></a> Руководство для запуска на удаленном сервере
+
+### Шаг 1: Клонирование репозиториев
+
+Создайте новую директорию. Откройте терминал на вашем локальном
+компьютере и клонируйте рабочие репозитории для бекенда и фронтенда:
+
+```
+git clone https://github.com/friends-locator/backend.git
+git clone https://github.com/friends-locator/frontend.git
+```
+
+### Шаг 2: Установка на сервере Docker, Docker Compose:
+
+```
+sudo apt install curl 
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+sudo apt-get install docker-compose-plugin
+```
+
+### Шаг 3: Создание тома базы данных
+
+Это приложение использует внешний том для базы данных,
+поэтому перед началом работы вы должны создать этот том:
+
+```
+docker volume create --name=pg_volume
+```
+
+### Шаг 4: Копирование необходимых файлов
+
+Перейдите в папку infra вашего проекта backend:
 
 ```
 cd backend/infra/
 ```
 
+Скопируйте папку infra на удаленный сервер любым
+удобным вам способом, например через scp:
+
 ```
-scp docker-compose.yml <username>@<IP>:/<address of your project on the server>/
-scp nginx.conf <username>@<IP>:/<address of your project on the server>/
-# username - username of the server
-# IP - public IP address of the server
+scp -r infra username@IP:infra   # username - имя пользователя на сервере
+                                 # IP - публичный IP сервера
 ```
 
-## enviroment:
-In the repository settings on GitHub, create environment variables in the Settings -> Secrets -> Actions:
-- SECRET_KEY=... # secret key from Django project
-- DB_ENGINE=... # indicate that we are working with postgresql
-- DB_NAME=... # database name
-- POSTGRES_USER=... # login to connect to the database
-- POSTGRES_PASSWORD=... # password to connect to the database (set your own)
-- DB_HOST=db # name of the service (container)
-- DB_PORT=5432 # port to connect to the database
-- EMAIL_HOST_USER=friends-locator@yandex.ru
-- ELASTICEMAIL_API_KEY=... # email integration key
-- LOCALHOST=localhost
-- LOCALHOST_IP=127.0.0.1
-- CONTAINER_NAME=... # name of your container
-- DOMAIN=flap.acceleratorpracticum.ru
-- SERVER_IP=... # IP of your server
-- EVERYONE=0.0.0.0
+### Шаг 5: Запустите сервер
 
+Запустите команду:
 
-## Docker:
-1. This app's using external volume for DB so before you start you should create this volume:
-    #### docker volume create --name=pg_volume
-2. After that build and launch containers:
-    #### docker-compose up -d --build
-For now app is available at localhost
+```
+docker-compose up -d
+```
 
+### Шаг 6: Первоначальная настройка
 
-If you'll need any *manage.py* commands then you'll want to use prefix:
+После успешной сборки не забудьте выполнить миграции, создать учетную запись администратора
+и заполнить статистику.
 
-    docker-compose exec backend python manage.py *comand*
+Выполнить миграции:
 
-Admin-zone is available at:
+```
+sudo docker-compose exec backend python manage.py migrate
+```
 
-    https://your_host/admin/
+Создать суперпользователя:
 
-All available endpoints and responses you can find in documentation:
+```
+sudo docker compose exec backend python manage.py createsuperuser
+```
 
-    https://your_host/api/docs/
+Собрать статику:
 
+```
+sudo docker compose exec backend python manage.py collectstatic --noinput
+```
 
-Examples requests:
--
-    - GET http://127.0.0.1:8000/api/v1/users/me
-    - POST http://127.0.0.1:8000/api/v1/users/id/add-friend
-    - DELETE http://127.0.0.1:8000/api/v1/users/id/delete-friend
+# <a id="howto-dev"></a> Руководство для разработчиков <a name="dev_guide"></a>
 
-Examples of responses:
--
-    - GET {
-        "id": 5,
-        "email": "kolya@mail.ru",
-        "username": "kolya",
-        "first_name": "",
-        "last_name": ""
-        }
-    - POST {
-        "id": 3,
-        "email": "pasha@mail.ru",
-        "username": "pasha",
-        "first_name": "",
-        "last_name": ""
-        }
+Это руководство поможет вам быстро начать работу с проектом "Friends Locator".
+Следуйте этим шагам, чтобы настроить окружение разработки:
 
-### Project authors:
+### Шаг 1: Клонирование репозиториев
+
+Создайте новую директорию. Откройте терминал на вашем локальном
+компьютере и клонируйте рабочие репозитории для бекенда и фронтенда:
+
+```
+git clone https://github.com/friends-locator/backend.git
+git clone https://github.com/friends-locator/frontend.git
+```
+
+### Шаг 2: Изменение адреса API
+
+Вам необходимо изменить адрес API для фронтенда для взаимодействия с локальным сервером.
+Откройте файл frontend/src/constants/apiTemplate.js и замените строку:
+
+```
+const BASE_URL = 'https://flap.acceleratorpracticum.ru/api/v1';
+```
+
+на
+
+```
+const BASE_URL = 'http://localhost/api/v1';
+```
+
+### Шаг 3: Сборка Docker контейнеров
+
+Перейдите в директорию infra-dev в бекенд-репозитории:
+
+```
+cd backend/infra-dev
+```
+
+Скопируйте .env.template в .env
+
+```
+cp .env.template .env
+```
+
+Запустите сборку с помощью Docker Compose:
+
+```
+docker-compose up -d --build
+```
+
+### Шаг 4: Миграции и создание учетной записи администратора
+
+Перейдите в корневую директорию бекенд репозитория.
+Теперь выполните миграции базы данных и создайте учетную запись администратора:
+
+```
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+### Шаг 5: Сборка статики
+
+Соберите статику с помощью следующей команды:
+
+```
+python manage.py collectstatic --noinput
+```
+
+### Шаг 6: Создание папки для медиафайлов
+
+Создайте папку для хранения медиафайлов:
+
+```
+mkdir media
+```
+
+### Шаг 7: Настройка почтового шлюза
+
+Для разработки используйте console.EmailBackend, для этого в настройках
+settings.py раскомментируйте строку EMAIL_BACKEND:
+
+```
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+```
+
+и закомментируйте строку:
+
+```
+EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
+```
+
+В итоге должно получиться так:
+
+```
+#EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+```
+
+### Шаг 8: Запуск сервера
+
+```
+python manage.py runserver
+```
+
+Готово! Вы успешно настроили окружение разработки. Теперь вы можете приступить
+к разработке. Сайт будет доступен по адресу: http://localhost/
+
+## <a id="authors"></a> Авторы:
 
 Larkin Mikhail
 https://github.com/IhateChoosingNickNames
@@ -129,3 +249,6 @@ https://github.com/LevityLoveLight
 
 Smirnov Alexey
 https://github.com/AxelVonReems
+
+Lashkin Sergey
+https://github.com/lashkinse

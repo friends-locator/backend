@@ -10,21 +10,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 SECRET_KEY = os.getenv(
     "SECRET_KEY",
-    default="django-insecure-hnx2%flrjxay-o@nh3#b+b+$c8zfavmnl629_250*y!xudtwn3",
+    "django-insecure-hnx2%flrjxay-o@nh3#b+b+$c8zfavmnl629_250*y!xudtwn3",
 )
-
 
 DEBUG = True
 
-ALLOWED_HOSTS = (
-    os.getenv("LOCALHOST"),
-    os.getenv("LOCALHOST_IP"),
-    os.getenv("CONTAINER_NAME"),
-    os.getenv("DOMAIN"),
-    os.getenv("SERVER_IP"),
-    os.getenv("EVERYONE"),
+ALLOWED_HOSTS = sorted(
+    [
+        os.getenv("LOCALHOST", "localhost"),
+        os.getenv("LOCALHOST_IP", "127.0.0.1"),
+        os.getenv("CONTAINER_NAME", "host.docker.internal"),
+        os.getenv("DOMAIN", "example.com"),
+        os.getenv("SERVER_IP", "127.0.0.1"),
+        os.getenv("EVERYONE", "0.0.0.0"),
+    ]
 )
-
 
 INSTALLED_APPS = (
     "django.contrib.admin",
@@ -33,7 +33,6 @@ INSTALLED_APPS = (
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Сторонние либы
     "rest_framework",
     "rest_framework.authtoken",
@@ -43,7 +42,6 @@ INSTALLED_APPS = (
     "drf_yasg",
     "corsheaders",
     "elasticemailbackend",
-
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
@@ -71,7 +69,6 @@ CORS_ORIGIN_WHITELIST = (
 
 CORS_ALLOW_HEADERS = default_headers + ("Access-Control-Allow-Origin",)
 
-
 ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
@@ -92,27 +89,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#         "ATOMIC_REQUESTS": True,
-#     }
-# }
-
-# Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv(
-            "DB_ENGINE", default="django.db.backends.postgresql"
-        ),
-        "NAME": os.getenv("DB_NAME", default="postgres"),
-        "USER": os.getenv("POSTGRES_USER", default="postgres"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
-        "HOST": os.getenv("DB_HOST", default="db"),
-        "PORT": os.getenv("DB_PORT", default="5432"),
-        "ATOMIC_REQUESTS": True,
+        "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.getenv("DB_NAME", "postgres"),
+        "USER": os.getenv("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "postgres"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
 
@@ -144,17 +128,15 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 STATIC_URL = "backend_static/"
 STATIC_ROOT = BASE_DIR / "backend_static"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": (
         "rest_framework.throttling.AnonRateThrottle",
-        "rest_framework.throttling.UserRateThrottle"
+        "rest_framework.throttling.UserRateThrottle",
     ),
     "DEFAULT_THROTTLE_RATES": {
         "anon": "120/min",
@@ -169,10 +151,12 @@ REST_FRAMEWORK = {
     ),
 }
 
-DOMAIN = os.getenv("DOMAIN")
+DOMAIN = os.getenv("DOMAIN", "localhost")
 SITE_NAME = DOMAIN
-ACTIVATION_URL = os.getenv("ACTIVATION_URL")
-LOGIN_URL_ = os.getenv("LOGIN_URL_")
+ACTIVATION_URL = os.getenv(
+    "ACTIVATION_URL", "http://localhost/api/v1/users/activation/"
+)
+LOGIN_URL_ = os.getenv("LOGIN_URL_", "http://localhost/login")
 
 # Чтобы POST/PATCH можно было без слэша в конце юзать
 # APPEND_SLASH = False
@@ -200,9 +184,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-INTERNAL_IPS = (
-    os.getenv("LOCALHOSTIP"),
-)
+INTERNAL_IPS = (os.getenv("LOCALHOST_IP", "127.0.0.1"),)
 
 CSRF_TRUSTED_ORIGINS = (
     "http://" + DOMAIN,
@@ -211,12 +193,9 @@ CSRF_TRUSTED_ORIGINS = (
 AUTH_USER_MODEL = "users.CustomUser"
 
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
-
-ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY")
-EMAIL_HOST_USER = os.getenv(
-    "EMAIL_HOST_USER", default="friends-locator@yandex.ru"
-)
-
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY", "")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
