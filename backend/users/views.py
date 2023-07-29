@@ -28,7 +28,7 @@ class CustomUserViewSet(UserViewSet):
     pagination_class = None
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_fields = ("tags",)
-    search_fields = ("^email",)
+    search_fields = ("^email", "^username", "^first_name", "^last_name")
 
     @action(detail=False)
     def friends(self, request):
