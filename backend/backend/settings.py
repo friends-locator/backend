@@ -43,11 +43,13 @@ INSTALLED_APPS = (
     "drf_yasg",
     "corsheaders",
     "elasticemailbackend",
+    "django_apscheduler",
 
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
     "places.apps.PlacesConfig",
+    "chat_v1.apps.ChatV1Config",
 )
 
 MIDDLEWARE = (
@@ -223,3 +225,6 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+CLEAR_DB_TIME_HRS = 2  # 2 часа
+CLEAR_DB_TIME_SECONDS = 2 * 60 * 60  # 2 часа в секунда
