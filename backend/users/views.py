@@ -1,6 +1,6 @@
 import requests
-from django.db.models import F
 from django.conf import settings
+from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -17,6 +17,7 @@ from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
                           FriendSerializer, FriendsRelationshipSerializer,
+                          SettingsCategorySerializer, ThemeSerializer,
                           UserpicSerializer, UserStatusSerializer)
 
 
@@ -32,14 +33,14 @@ class CustomUserViewSet(UserViewSet):
 
     @action(detail=False)
     def friends(self, request):
-        query_param = self.request.GET.get('friends_category')
+        query_param = self.request.GET.get("friends_category")
         if query_param:
             friends = request.user.friends.filter(
                 friend__friend_category=query_param
-            ).annotate(friend_category=F('friend__friend_category'))
+            ).annotate(friend_category=F("friend__friend_category"))
         else:
             friends = request.user.friends.all().annotate(
-                friend_category=F('friend__friend_category')
+                friend_category=F("friend__friend_category")
             )
         serializer = FriendSerializer(
             friends, many=True, context={"request": request}
@@ -179,6 +180,16 @@ class CustomUserViewSet(UserViewSet):
     )
     def get_friends(self, request, **kwargs):
         friends = request.user.friends.all()
+
+        # TODO Переделать в 1 запрос
+        # result = []
+        # for friend in friends:
+        #     s = FriendsRelationship.objects.filter(current_user=friend, friend=request.user).first()
+        #     if s.friend_category in friend.settings.not_visible_for_cats.all():
+        #         continue
+        #     result.append(friend)
+        # print(result)
+
         nearby_friends = friends.filter(
             longitude__gte=self.request.data["start_longitude"],
             longitude__lte=self.request.data["end_longitude"],
@@ -204,8 +215,7 @@ class CustomUserViewSet(UserViewSet):
         current_user = request.user
         friend = get_object_or_404(User, id=self.kwargs.get("id"))
         friendship_bond = FriendsRelationship.objects.get(
-            current_user=current_user,
-            friend=friend
+            current_user=current_user, friend=friend
         )
         serializer = FriendsRelationshipSerializer(
             friendship_bond,
@@ -216,7 +226,7 @@ class CustomUserViewSet(UserViewSet):
         if not serializer.is_valid():
             return Response(
                 {"Fail": "Передано некорректное наименование категории"},
-                status=HTTP_400_BAD_REQUEST
+                status=HTTP_400_BAD_REQUEST,
             )
         serializer.save()
         return Response(data=serializer.data, status=HTTP_201_CREATED)
@@ -260,6 +270,52 @@ class CustomUserViewSet(UserViewSet):
             )
         serializer.save()
         return Response(data=serializer.data, status=HTTP_201_CREATED)
+
+    @action(
+        methods=["patch", "delete"],
+        detail=True,
+        url_path="update-category-visibility",
+    )
+    def update_category_visibility(self, request, **kwargs):
+        serializer = SettingsCategorySerializer(
+            request.user,
+            partial=True,
+            data=self.request.data,
+            context={"request": request},
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
+            )
+        categories = request.data.get("categories", [])
+
+        if request.method == "PATCH":
+            for cat in categories:
+                request.user.settings.not_visible_for_cats.add(cat["id"])
+            return Response({"response": "success"}, status=HTTP_201_CREATED)
+        for cat in categories:
+            request.user.settings.not_visible_for_cats.remove(cat["id"])
+        return Response({"response": "success"}, status=HTTP_204_NO_CONTENT)
+
+    @action(
+        methods=["patch"],
+        detail=True,
+        url_path="update-theme-color",
+    )
+    def update_theme_color(self, request, **kwargs):
+        serializer = ThemeSerializer(
+            request.user,
+            partial=True,
+            data=self.request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(data=serializer.data, status=HTTP_200_OK)
 
 
 class ActivateUserView(GenericAPIView):
