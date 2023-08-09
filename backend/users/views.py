@@ -184,8 +184,10 @@ class CustomUserViewSet(UserViewSet):
         # TODO Переделать в 1 запрос
         # result = []
         # for friend in friends:
-        #     s = FriendsRelationship.objects.filter(current_user=friend, friend=request.user).first()
-        #     if s.friend_category in friend.settings.not_visible_for_cats.all():
+        #     s = FriendsRelationship.objects.filter(current_user=friend,
+        #     friend=request.user).first()
+        #     if s.friend_category in friend.settings.
+        #     not_visible_for_cats.all():
         #         continue
         #     result.append(friend)
         # print(result)
