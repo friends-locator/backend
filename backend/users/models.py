@@ -156,51 +156,6 @@ class CustomUser(AbstractUser):
         return self.username
 
 
-class FriendsRelationship(models.Model):
-    """Промежуточная/вспомогательная таблица юзер-друзья."""
-
-    NONE_CATEGORY = "none_category"
-    FRIENDS = "friends"
-    FAMILY = "family"
-    CATEGORY_CHOICES = [
-        (NONE_CATEGORY, "Без категории"),
-        (FRIENDS, "Близкие друзья"),
-        (FAMILY, "Семья"),
-    ]
-
-    current_user = models.ForeignKey(
-        CustomUser,
-        verbose_name=_("Текущий пользователь"),
-        related_name="current_user",
-        on_delete=models.CASCADE,
-    )
-    friend = models.ForeignKey(
-        CustomUser,
-        verbose_name=_("Друг"),
-        related_name="friend",
-        on_delete=models.CASCADE,
-    )
-    friend_category = models.CharField(
-        max_length=50,
-        choices=CATEGORY_CHOICES,
-        verbose_name=_("Название категории"),
-        help_text=_("Укажите категорию друга"),
-        default=NONE_CATEGORY
-    )
-
-    class Meta:
-        constraints = (
-            models.UniqueConstraint(
-                name=_("%(app_label)s_%(class)s_unique_relationships"),
-                fields=("current_user", "friend"),
-            ),
-            models.CheckConstraint(
-                name=_("%(app_label)s_%(class)s_prevent_self_add"),
-                check=~models.Q(current_user=F("friend")),
-            ),
-        )
-
-
 class FriendsRequest(models.Model):
     """Таблица запросов в друзья."""
 
@@ -228,3 +183,77 @@ class FriendsRequest(models.Model):
                 check=~models.Q(from_user=F("to_user")),
             ),
         )
+
+
+class FriendsRelationship(models.Model):
+    """Промежуточная/вспомогательная таблица юзер-друзья."""
+
+    current_user = models.ForeignKey(
+        CustomUser,
+        verbose_name=_("Текущий пользователь"),
+        related_name="current_user",
+        on_delete=models.CASCADE,
+    )
+    friend = models.ForeignKey(
+        CustomUser,
+        verbose_name=_("Друг"),
+        related_name="friend",
+        on_delete=models.CASCADE,
+    )
+    friend_category = models.ForeignKey(
+        "FriendCategory",
+        verbose_name=_("Название категории"),
+        help_text=_("Укажите категорию друга"),
+        # TODO на проде нужно будет сначала заполнить БД
+        default=1,
+        on_delete=models.SET_DEFAULT,
+    )
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                name=_("%(app_label)s_%(class)s_unique_relationships"),
+                fields=("current_user", "friend"),
+            ),
+            models.CheckConstraint(
+                name=_("%(app_label)s_%(class)s_prevent_self_add"),
+                check=~models.Q(current_user=F("friend")),
+            ),
+        )
+
+
+class FriendCategory(models.Model):
+    """Модель категорий."""
+
+    name = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name=_("Название"),
+        help_text=_("Введите название"),
+    )
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name = _("Категория")
+        verbose_name_plural = _("Категории")
+
+
+class Settings(models.Model):
+    """Модель настроек."""
+
+    user = models.OneToOneField(
+        CustomUser,
+        verbose_name=_("Текущий пользователь"),
+        related_name="settings",
+        on_delete=models.CASCADE,
+    )
+    is_black_theme = models.BooleanField(
+        verbose_name=_("Темная тема да/нет"),
+        default=False,
+    )
+    not_visible_for_cats = models.ManyToManyField(
+        FriendCategory,
+        related_name="visibility",
+        verbose_name=_("Категории"),
+        help_text=_("Выберите категории"),
+    )

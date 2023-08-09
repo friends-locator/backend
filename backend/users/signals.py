@@ -1,7 +1,7 @@
-from django.db.models.signals import post_delete, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
-from users.models import CustomUser
+from users.models import CustomUser, Settings
 from users.utils import media_folder_cleaner
 
 
@@ -36,5 +36,12 @@ def pre_save_image(sender, instance, *args, **kwargs):
         pass
 
 
+@receiver(post_save, sender=CustomUser)
+def post_save_settings(sender, instance, created=False, **kwargs):
+    if created:
+        Settings.objects.create(user=instance)
+
+
 post_delete.connect(post_delete_image, sender=CustomUser)
 pre_save.connect(pre_save_image, sender=CustomUser)
+post_delete.connect(post_save_settings, sender=CustomUser)

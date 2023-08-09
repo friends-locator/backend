@@ -9,7 +9,7 @@ from rest_framework.serializers import (CurrentUserDefault, HiddenField,
                                         SerializerMethodField, ValidationError)
 
 from .models import CustomUser as User
-from .models import FriendsRelationship
+from .models import FriendCategory, FriendsRelationship, Settings
 
 
 class Base64ImageField(ImageField):
@@ -85,6 +85,7 @@ class UserpicSerializer(ModelSerializer):
 
 class FriendsRelationshipSerializer(ModelSerializer):
     """Кастомный сериализатор для работы с дружескими связями."""
+
     class Meta:
         model = FriendsRelationship
         fields = (
@@ -96,6 +97,7 @@ class FriendsRelationshipSerializer(ModelSerializer):
 
 class FriendSerializer(ModelSerializer):
     """Кастомный сериализатор для работы с друзьями."""
+
     friend_category = SerializerMethodField()
 
     class Meta:
@@ -152,5 +154,42 @@ class UserStatusSerializer(ModelSerializer):
         fields = (
             "user",
             "status",
+        )
+        read_only_fields = ("user",)
+
+
+class ThemeSerializer(ModelSerializer):
+    """Сериализатор для обновления цвета."""
+
+    user = HiddenField(default=CurrentUserDefault())
+
+    class Meta:
+        model = Settings
+        fields = (
+            "user",
+            "is_black_theme",
+        )
+        read_only_fields = ("user",)
+
+
+class CategorySerializer(ModelSerializer):
+    """Сериализатор категорий."""
+
+    class Meta:
+        model = FriendCategory
+        fields = ("id",)
+
+
+class SettingsCategorySerializer(ModelSerializer):
+    """Сериализатор для настроек видимости для категорий."""
+
+    user = HiddenField(default=CurrentUserDefault())
+    categories = CategorySerializer(many=True, allow_null=True)
+
+    class Meta:
+        model = Settings
+        fields = (
+            "user",
+            "categories",
         )
         read_only_fields = ("user",)
