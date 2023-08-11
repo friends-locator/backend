@@ -96,7 +96,9 @@ class CustomUser(AbstractUser):
     )
     userpic = models.ImageField(
         upload_to="uploads/%Y/%m/%d/",
-        validators=[FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"])],
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"]),
+        ],
         verbose_name=_("Фото пользователя"),
         help_text=_("Выберите изображение"),
         blank=True,
