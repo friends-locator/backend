@@ -1,6 +1,7 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Place, SharedPlaces
 from .permissions import IsAuthor
@@ -21,6 +22,7 @@ class PlacesViewSet(viewsets.ModelViewSet):
         methods=["post"],
         detail=True,
         url_path="share-place",
+        permission_classes=(IsAuthenticated,),
     )
     def share_place(self, request, **kwargs):
         sharing_place = self.kwargs.get("pk")
@@ -29,11 +31,15 @@ class PlacesViewSet(viewsets.ModelViewSet):
             "sharing_place": sharing_place,
             "sharing_to_user": sharing_to_user,
         }
-        serializer = SharingSerializer(data=data, context={"request": request})
+        serializer = SharingSerializer(
+            data=data,
+            context={"request": request},
+        )
 
         if not serializer.is_valid():
             return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         serializer.save(sharing_user=self.request.user)
@@ -43,6 +49,7 @@ class PlacesViewSet(viewsets.ModelViewSet):
         methods=["delete"],
         detail=True,
         url_path="stop-sharing-place",
+        permission_classes=(IsAuthenticated,),
     )
     def stop_sharing_place(self, request, **kwargs):
         sharing_place = self.kwargs.get("pk")
@@ -67,10 +74,11 @@ class PlacesViewSet(viewsets.ModelViewSet):
         methods=["get"],
         detail=False,
         url_path="all-shared-places",
+        permission_classes=(IsAuthenticated,),
     )
     def all_shared_places(self, request, user_id):
         all_requests = SharedPlaces.objects.filter(
-            sharing_user=self.request.user
+            sharing_user=self.request.user,
         )
         serializer = SharingSerializer(
             all_requests, many=True, context={"request": request}
