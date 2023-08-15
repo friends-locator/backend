@@ -97,7 +97,7 @@ class CustomUser(AbstractUser):
     userpic = models.ImageField(
         upload_to="uploads/%Y/%m/%d/",
         validators=[
-            FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"]),
+            FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png"])
         ],
         verbose_name=_("Фото пользователя"),
         help_text=_("Выберите изображение"),
@@ -185,7 +185,7 @@ class FriendsRelationship(models.Model):
         choices=CATEGORY_CHOICES,
         verbose_name=_("Название категории"),
         help_text=_("Укажите категорию друга"),
-        default=NONE_CATEGORY,
+        default=NONE_CATEGORY
     )
 
     class Meta:

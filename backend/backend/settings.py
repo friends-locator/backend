@@ -33,6 +33,7 @@ INSTALLED_APPS = (
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     # Сторонние либы
     "rest_framework",
     "rest_framework.authtoken",
@@ -42,6 +43,7 @@ INSTALLED_APPS = (
     "drf_yasg",
     "corsheaders",
     "elasticemailbackend",
+
     # Приложения
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
@@ -102,7 +104,9 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Postgress
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
+        "ENGINE": os.getenv(
+            "DB_ENGINE", default="django.db.backends.postgresql"
+        ),
         "NAME": os.getenv("DB_NAME", default="postgres"),
         "USER": os.getenv("POSTGRES_USER", default="postgres"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="adm"),
@@ -150,14 +154,16 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": (
         "rest_framework.throttling.AnonRateThrottle",
-        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.UserRateThrottle"
     ),
     "DEFAULT_THROTTLE_RATES": {
         "anon": "120/min",
         "user": "120/min",
     },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
@@ -194,7 +200,9 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-INTERNAL_IPS = (os.getenv("LOCALHOSTIP"),)
+INTERNAL_IPS = (
+    os.getenv("LOCALHOSTIP"),
+)
 
 CSRF_TRUSTED_ORIGINS = (
     "http://" + DOMAIN,
@@ -205,7 +213,9 @@ AUTH_USER_MODEL = "users.CustomUser"
 EMAIL_BACKEND = "elasticemailbackend.backend.ElasticEmailBackend"
 
 ELASTICEMAIL_API_KEY = os.getenv("ELASTICEMAIL_API_KEY")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", default="friends-locator@yandex.ru")
+EMAIL_HOST_USER = os.getenv(
+    "EMAIL_HOST_USER", default="friends-locator@yandex.ru"
+)
 
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

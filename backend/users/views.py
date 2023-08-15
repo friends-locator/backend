@@ -1,6 +1,6 @@
 import requests
-from django.conf import settings
 from django.db.models import F
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,6 +15,7 @@ from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
 
 from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
+from .permissions import IsOwner
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
                           FriendSerializer, FriendsRelationshipSerializer,
                           UserpicSerializer, UserStatusSerializer)
@@ -32,19 +33,17 @@ class CustomUserViewSet(UserViewSet):
 
     @action(detail=False)
     def friends(self, request):
-        query_param = self.request.GET.get("friends_category")
+        query_param = self.request.GET.get('friends_category')
         if query_param:
             friends = request.user.friends.filter(
                 friend__friend_category=query_param
-            ).annotate(friend_category=F("friend__friend_category"))
+            ).annotate(friend_category=F('friend__friend_category'))
         else:
             friends = request.user.friends.all().annotate(
-                friend_category=F("friend__friend_category")
+                friend_category=F('friend__friend_category')
             )
         serializer = FriendSerializer(
-            friends,
-            many=True,
-            context={"request": request},
+            friends, many=True, context={"request": request}
         )
         return Response(serializer.data, status=HTTP_200_OK)
 
@@ -62,19 +61,14 @@ class CustomUserViewSet(UserViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
         if FriendsRequest.objects.filter(
-            from_user=to_user,
-            to_user=from_user,
+            from_user=to_user, to_user=from_user
         ).exists():
             FriendsRequest.objects.filter(
-                from_user=to_user,
-                to_user=from_user,
+                from_user=to_user, to_user=from_user
             ).delete()
             from_user.friends.add(to_user)
         else:
-            FriendsRequest.objects.create(
-                from_user=from_user,
-                to_user=to_user,
-            )
+            FriendsRequest.objects.create(from_user=from_user, to_user=to_user)
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     @action(
@@ -97,8 +91,7 @@ class CustomUserViewSet(UserViewSet):
                 {"errors": "Такой заявки нет."}, status=HTTP_400_BAD_REQUEST
             )
         FriendsRequest.objects.filter(
-            from_user=from_user,
-            to_user=to_user,
+            from_user=from_user, to_user=to_user
         ).delete()
         from_user.friends.add(to_user)
         return Response(serializer.data, status=HTTP_201_CREATED)
@@ -137,8 +130,7 @@ class CustomUserViewSet(UserViewSet):
                 status=HTTP_400_BAD_REQUEST,
             )
         FriendsRequest.objects.filter(
-            from_user=from_user,
-            to_user=to_user,
+            from_user=from_user, to_user=to_user
         ).delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -157,6 +149,7 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["patch"],
         detail=True,
+        permission_classes=(IsOwner,),
         url_path="update-coordinates",
     )
     def update_coordinates(self, request, **kwargs):
@@ -169,8 +162,7 @@ class CustomUserViewSet(UserViewSet):
         )
         if not serializer.is_valid():
             return Response(
-                data=serializer.errors,
-                status=HTTP_400_BAD_REQUEST,
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
             )
         serializer.save()
         return Response(data=serializer.data, status=HTTP_201_CREATED)
@@ -207,7 +199,8 @@ class CustomUserViewSet(UserViewSet):
         current_user = request.user
         friend = get_object_or_404(User, id=self.kwargs.get("id"))
         friendship_bond = FriendsRelationship.objects.get(
-            current_user=current_user, friend=friend
+            current_user=current_user,
+            friend=friend
         )
         serializer = FriendsRelationshipSerializer(
             friendship_bond,
@@ -218,7 +211,7 @@ class CustomUserViewSet(UserViewSet):
         if not serializer.is_valid():
             return Response(
                 {"Fail": "Передано некорректное наименование категории"},
-                status=HTTP_400_BAD_REQUEST,
+                status=HTTP_400_BAD_REQUEST
             )
         serializer.save()
         return Response(data=serializer.data, status=HTTP_201_CREATED)
@@ -226,6 +219,7 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["patch"],
         detail=True,
+        permission_classes=(IsOwner,),
         url_path="update-user-pic",
     )
     def update_user_pic(self, request, **kwargs):
@@ -238,8 +232,7 @@ class CustomUserViewSet(UserViewSet):
         )
         if not serializer.is_valid():
             return Response(
-                data=serializer.errors,
-                status=HTTP_400_BAD_REQUEST,
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
             )
         serializer.save()
         return Response(data=serializer.data, status=HTTP_201_CREATED)
@@ -247,6 +240,7 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["patch"],
         detail=True,
+        permission_classes=(IsOwner,),
         url_path="update-user-status",
     )
     def update_user_status(self, request, **kwargs):
@@ -258,8 +252,7 @@ class CustomUserViewSet(UserViewSet):
         )
         if not serializer.is_valid():
             return Response(
-                data=serializer.errors,
-                status=HTTP_400_BAD_REQUEST,
+                data=serializer.errors, status=HTTP_400_BAD_REQUEST
             )
         serializer.save()
         return Response(data=serializer.data, status=HTTP_201_CREATED)

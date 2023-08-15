@@ -4,9 +4,9 @@ from re import match
 from django.conf import settings
 from django.core.files.base import ContentFile
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework.serializers import (CharField, CurrentUserDefault,
-                                        HiddenField, ImageField,
-                                        ModelSerializer, ValidationError)
+from rest_framework.serializers import (CurrentUserDefault, HiddenField,
+                                        ImageField, ModelSerializer,
+                                        SerializerMethodField, ValidationError)
 
 from .models import CustomUser as User
 from .models import FriendsRelationship
@@ -85,7 +85,6 @@ class UserpicSerializer(ModelSerializer):
 
 class FriendsRelationshipSerializer(ModelSerializer):
     """Кастомный сериализатор для работы с дружескими связями."""
-
     class Meta:
         model = FriendsRelationship
         fields = (
@@ -97,11 +96,7 @@ class FriendsRelationshipSerializer(ModelSerializer):
 
 class FriendSerializer(ModelSerializer):
     """Кастомный сериализатор для работы с друзьями."""
-
-    friend_category = CharField(
-        source="friendsrelationship.friend_category",
-        read_only=True,
-    )
+    friend_category = SerializerMethodField()
 
     class Meta:
         model = User
@@ -124,6 +119,9 @@ class FriendSerializer(ModelSerializer):
             "latitude",
             "friend_category",
         )
+
+    def get_friend_category(self, data):
+        return data.friend_category
 
 
 class CoordinateSerializer(ModelSerializer):
