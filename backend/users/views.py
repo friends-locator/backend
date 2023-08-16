@@ -4,6 +4,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser.permissions import CurrentUserOrAdminOrReadOnly
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -30,6 +31,7 @@ class CustomUserViewSet(UserViewSet):
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_fields = ("tags",)
     search_fields = ("^email", "^username", "^first_name", "^last_name")
+    permission_classes = (CurrentUserOrAdminOrReadOnly,)
 
     @action(detail=False)
     def friends(self, request):
