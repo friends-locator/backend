@@ -4,17 +4,19 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser.permissions import CurrentUserOrAdminOrReadOnly
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
                                    HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST)
 
 from .models import CustomUser as User
 from .models import FriendsRelationship, FriendsRequest
+from .permissions import IsOwner
 from .serializers import (CoordinateSerializer, CustomUserSerializer,
                           FriendSerializer, FriendsRelationshipSerializer,
                           UserpicSerializer, UserStatusSerializer)
@@ -29,6 +31,7 @@ class CustomUserViewSet(UserViewSet):
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_fields = ("tags",)
     search_fields = ("^email", "^username", "^first_name", "^last_name")
+    permission_classes = (CurrentUserOrAdminOrReadOnly,)
 
     @action(detail=False)
     def friends(self, request):
@@ -49,7 +52,6 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["post"],
         detail=True,
-        permission_classes=(IsAuthenticated,),
         url_path="add-friend",
     )
     def add_friend(self, request, **kwargs):
@@ -74,7 +76,6 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["post"],
         detail=True,
-        permission_classes=(IsAuthenticated,),
         url_path="approved",
     )
     def approve_request(self, request, **kwargs):
@@ -100,7 +101,6 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["delete"],
         detail=True,
-        permission_classes=(IsAuthenticated,),
         url_path="delete-friend",
     )
     def delete_friend(self, request, **kwargs):
@@ -119,7 +119,6 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["delete"],
         detail=True,
-        permission_classes=(IsAuthenticated,),
         url_path="delete-request",
     )
     def delete_request(self, request, **kwargs):
@@ -140,7 +139,6 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["get"],
         detail=False,
-        permission_classes=(IsAuthenticated,),
         url_path="all-requests",
     )
     def all_requests(self, request):
@@ -153,7 +151,7 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["patch"],
         detail=True,
-        permission_classes=(IsAuthenticated,),
+        permission_classes=(IsOwner,),
         url_path="update-coordinates",
     )
     def update_coordinates(self, request, **kwargs):
@@ -174,7 +172,6 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["get"],
         detail=False,
-        permission_classes=(IsAuthenticated,),
         url_path="get-friends",
     )
     def get_friends(self, request, **kwargs):
@@ -224,7 +221,7 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["patch"],
         detail=True,
-        permission_classes=(IsAuthenticated,),
+        permission_classes=(IsOwner,),
         url_path="update-user-pic",
     )
     def update_user_pic(self, request, **kwargs):
@@ -245,6 +242,7 @@ class CustomUserViewSet(UserViewSet):
     @action(
         methods=["patch"],
         detail=True,
+        permission_classes=(IsOwner,),
         url_path="update-user-status",
     )
     def update_user_status(self, request, **kwargs):
